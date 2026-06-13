@@ -20,6 +20,7 @@ const Data = (() => {
     campaignStats: [],  // {date,totalActions,totalFocusSeconds}
     evidenceHashes: {}, // sha256 -> {agentId,missionId,date}
     processedDispatchIds: [],
+    templates: [],      // {name, tasks:[{text,priority,constraintType,sector}]} — reusable mission packs
     settings: {
       backupEveryMin: 30,
       densityMaxPerHour: 12,
@@ -236,6 +237,16 @@ const Data = (() => {
     U.toast('Export downloaded', 'ok');
   }
 
+  /** Factory reset: wipes in-memory state + browser mirror. The vault file on
+      disk is rewritten on the next save — export first if in doubt. */
+  function factoryReset() {
+    state = DEFAULTS();
+    try { localStorage.removeItem('civitas-state-mirror'); } catch {}
+    touch();
+    if (window.App) App.refreshAll();
+    U.toast('Factory reset complete — state is empty', 'warn');
+  }
+
   async function importFromFile(file) {
     const text = await U.readFileText(file);
     state = migrate(JSON.parse(text));
@@ -340,7 +351,7 @@ const Data = (() => {
   return {
     init, touch, saveNow, snapshot,
     connectVault, reconnect, chooseBackupDir, chooseDropzone,
-    exportDownload, importFromFile,
+    exportDownload, importFromFile, factoryReset,
     logActivity, addFocusSeconds, statsFor, getVolunteer,
     vaultStatus, updatePills,
     onChange: fn => listeners.push(fn),

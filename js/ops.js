@@ -12,6 +12,34 @@ const Ops = (() => {
 
   const PRIORITY_XP = { high: 30, medium: 20, low: 10 };
 
+  /* Built-in tactical templates (from the Party Whip prototype) — reusable
+     campaign packs deployed in one click. Custom packs live in state.templates. */
+  const BUILTIN_PACKS = {
+    social_blast: {
+      name: 'Operation: Social Blast',
+      tasks: [
+        { text: 'Share the current campaign card on socials', priority: 'medium', constraintType: 'trust', sector: 'ONLINE' },
+        { text: 'Reply to 3 comments with Pocket MMT rebuttals', priority: 'medium', constraintType: 'trust', sector: 'ONLINE' },
+        { text: 'Post the thread link to the group chat', priority: 'low', constraintType: 'trust', sector: 'ONLINE' },
+      ],
+    },
+    mp_pressure: {
+      name: 'Operation: MP Pressure',
+      tasks: [
+        { text: 'Email the MP on the current campaign issue', priority: 'high', constraintType: 'evidence', sector: 'ELECTORATE' },
+        { text: 'Call the MP office and log the response', priority: 'high', constraintType: 'evidence', sector: 'ELECTORATE' },
+        { text: 'Record the outcome in the campaign log note', priority: 'medium', constraintType: 'trust', sector: 'RESEARCH' },
+      ],
+    },
+    sticker_run: {
+      name: 'Operation: Sticker Run',
+      tasks: [
+        { text: 'Print the sticker batch', priority: 'medium', constraintType: 'trust', sector: 'COWRA-CBD' },
+        { text: 'Hit the High St run — photograph the last placement', priority: 'medium', constraintType: 'evidence', sector: 'COWRA-CBD' },
+      ],
+    },
+  };
+
   function missions() { return Data.state.missions; }
 
   /* ---------- create ---------- */
@@ -41,8 +69,78 @@ const Ops = (() => {
     missions().push(m);
     Data.logActivity('HQ', 'MISSION_CREATED', m.text.slice(0, 80));
     $('ops-text').value = ''; $('ops-challenge').value = ''; $('ops-standing').checked = false;
+    $('ops-date-preview').classList.add('hidden');
     if (date) U.toast('Due date parsed: ' + U.fmtDate(date), 'ok');
     render();
+  }
+
+  /* ---------- template packs ---------- */
+
+  function renderTemplates() {
+    const sel = $('ops-template');
+    if (!sel) return;
+    const custom = Data.state.templates || [];
+    sel.innerHTML = '<option value="">TACTICAL TEMPLATES…</option>'
+      + Object.entries(BUILTIN_PACKS).map(([k, p]) => `<option value="b:${k}">${U.esc(p.name)}</option>`).join('')
+      + custom.map((p, i) => `<option value="c:${i}">PACK: ${U.esc(p.name)}</option>`).join('');
+  }
+
+  function applyTemplate() {
+    const val = $('ops-template').value;
+    if (!val) return;
+    const [kind, key] = [val[0], val.slice(2)];
+    const pack = kind === 'b' ? BUILTIN_PACKS[key] : (Data.state.templates || [])[+key];
+    if (!pack) return;
+    for (const t of pack.tasks) {
+      missions().push({
+        id: U.id('msn'), text: t.text, priority: t.priority || 'medium',
+        constraints: { type: t.constraintType || 'trust' },
+        sector: (t.sector || 'GENERAL').toUpperCase(), due: null,
+        completed: false, completedAt: null, completedBy: null, evidence: null,
+        isStandingOrder: false, lastCompletedDate: null, streak: 0,
+        timestamp: Date.now(), broadcastAt: null,
+      });
+    }
+    Data.logActivity('HQ', 'PACK_APPLIED', `${pack.name} (${pack.tasks.length} missions)`);
+    $('ops-template').value = '';
+    U.toast(`Deployed ${pack.tasks.length} missions from ${pack.name}`, 'ok');
+    render();
+  }
+
+  function savePackDialog() {
+    const active = missions().filter(m => !m.isStandingOrder && !m.completed);
+    if (!active.length) { U.toast('No active missions to save as a pack', 'warn'); return; }
+    const body = U.el('div');
+    body.innerHTML = `
+      <p class="dim">Save the ${active.length} active mission(s) as a reusable tactical template.
+      (Challenge gates are saved as trust — pass-answers never travel inside templates.)</p>
+      <label class="lbl">PACK NAME</label>
+      <input id="pack-name" class="inp" placeholder="e.g. Cowra Blitz">`;
+    U.modal({
+      title: 'SAVE MISSION PACK', body,
+      actions: [
+        { label: 'CANCEL', kind: 'ghost' },
+        {
+          label: 'SAVE PACK', kind: 'amber', onClick: close => {
+            const name = body.querySelector('#pack-name').value.trim();
+            if (!name) { U.toast('Pack name required', 'warn'); return; }
+            Data.state.templates = Data.state.templates || [];
+            Data.state.templates.push({
+              name,
+              tasks: active.map(m => ({
+                text: m.text, priority: m.priority,
+                constraintType: m.constraints.type === 'challenge' ? 'trust' : m.constraints.type,
+                sector: m.sector,
+              })),
+            });
+            Data.touch();
+            close();
+            renderTemplates();
+            U.toast(`Pack "${name}" saved (${active.length} missions)`, 'ok');
+          }
+        },
+      ]
+    });
   }
 
   /* ---------- completion flows (constraint-gated) ---------- */
@@ -338,14 +436,24 @@ const Ops = (() => {
   function init() {
     $('ops-add').addEventListener('click', createMission);
     $('ops-text').addEventListener('keydown', e => { if (e.key === 'Enter') createMission(); });
+    // live due-date preview while typing ("Call MP next Friday" -> 📅 19/06/2026)
+    $('ops-text').addEventListener('input', () => {
+      const { date } = U.parseNaturalDate($('ops-text').value);
+      const prev = $('ops-date-preview');
+      prev.textContent = date ? '📅 due date parsed: ' + U.fmtDate(date) : '';
+      prev.classList.toggle('hidden', !date);
+    });
     $('ops-constraint').addEventListener('change', () =>
       $('ops-challenge-wrap').classList.toggle('hidden', $('ops-constraint').value !== 'challenge'));
     $('ops-broadcast').addEventListener('click', broadcastPack);
+    $('ops-template').addEventListener('change', applyTemplate);
+    $('ops-savepack').addEventListener('click', savePackDialog);
     $('focus-toggle').addEventListener('click', toggleFocus);
     $('focus-bank').addEventListener('click', bankFocus);
     scheduleMidnightReset();
+    renderTemplates();
     render();
   }
 
-  return { init, show: render, render };
+  return { init, show: () => { renderTemplates(); render(); }, render };
 })();

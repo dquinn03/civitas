@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <!-- ?v= busts the browser HTTP cache on upgrades (python http.server sends no cache headers) — bump on every release -->
-  <link rel="stylesheet" href="css/civitas.css?v=1.0.0">
+  <link rel="stylesheet" href="css/civitas.css?v=1.1.0">
 </head>
 <body>
 
@@ -23,6 +23,7 @@
     <div class="brand">
       <i class="fa-solid fa-chess-rook"></i> CIVITAS
       <span class="brand-sub">COMMAND TERMINAL · COWRA HQ</span>
+      <span id="hq-clock" class="hq-clock" title="Cowra time"></span>
     </div>
 
     <div class="topbar-right">
@@ -47,12 +48,14 @@
           <button id="vault-backupdir" class="vm-item"><i class="fa-solid fa-box-archive"></i> Choose backup folder…</button>
           <button id="vault-snapshot" class="vm-item"><i class="fa-solid fa-camera-retro"></i> Snapshot now</button>
           <hr>
+          <button id="vault-system" class="vm-item"><i class="fa-solid fa-server"></i> System status…</button>
           <button id="vault-export" class="vm-item"><i class="fa-solid fa-download"></i> Export JSON (any browser)</button>
           <label class="vm-item" for="vault-import" style="cursor:pointer"><i class="fa-solid fa-upload"></i> Import JSON…</label>
           <input type="file" id="vault-import" accept=".json" class="hidden">
         </div>
       </div>
 
+      <a href="https://darrenquinn.substack.com/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Open Substack"><i class="fa-solid fa-pen-nib"></i></a>
       <button id="help-btn" class="btn btn-ghost btn-sm" title="Rerun spotlight tour"><i class="fa-solid fa-circle-question"></i></button>
     </div>
   </header>
@@ -81,7 +84,11 @@
         <div class="panel-head">
           <input id="exo-title" class="inp inp-title" placeholder="Note title…">
           <input id="exo-tags" class="inp inp-sm" placeholder="tags, comma, separated" style="max-width:220px">
+          <button id="exo-bold" class="btn btn-ghost btn-sm" title="Bold selection"><i class="fa-solid fa-bold"></i></button>
+          <button id="exo-h1" class="btn btn-ghost btn-sm" title="Heading"><i class="fa-solid fa-heading"></i></button>
+          <button id="exo-wikibtn" class="btn btn-ghost btn-sm" title="Wiki-link selection"><i class="fa-solid fa-link"></i></button>
           <button id="exo-toggle" class="btn btn-ghost btn-sm">PREVIEW</button>
+          <button id="exo-graph-btn" class="btn btn-ghost btn-sm" title="Concept graph — notes linked by [[wiki links]]"><i class="fa-solid fa-diagram-project"></i></button>
           <button id="exo-compile" class="btn btn-ghost btn-sm" title="Manuscript compiler"><i class="fa-solid fa-book"></i> COMPILE</button>
           <button id="exo-delete" class="btn btn-ghost btn-sm" title="Delete note"><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -119,6 +126,13 @@
             </div>
             <div id="ops-challenge-wrap" class="hidden">
               <input id="ops-challenge" class="inp inp-sm" placeholder="Challenge pass-answer (stored as SHA-256 only)">
+            </div>
+            <div id="ops-date-preview" class="date-preview hidden"></div>
+            <div class="composer-row" style="margin-top:8px">
+              <select id="ops-template" class="inp inp-sm" title="Deploy a reusable campaign pack">
+                <option value="">TACTICAL TEMPLATES…</option>
+              </select>
+              <button id="ops-savepack" class="btn btn-ghost btn-sm" title="Save current active missions as a reusable pack"><i class="fa-solid fa-floppy-disk"></i> SAVE PACK</button>
             </div>
           </div>
         </div>
@@ -172,9 +186,18 @@
           <span class="panel-title"><i class="fa-solid fa-users"></i> ROSTER <span class="dim">(<span id="net-count">0</span>)</span></span>
           <input id="net-search" class="inp inp-sm" placeholder="Filter agents…" style="max-width:240px">
           <span>
+            <button id="net-warroom" class="btn btn-ghost btn-sm" title="Filter the roster to a target cohort and copy their emails"><i class="fa-solid fa-crosshairs"></i> WAR ROOM</button>
             <button id="net-import" class="btn btn-ghost btn-sm"><i class="fa-solid fa-file-csv"></i> CSV IMPORT</button>
             <button id="net-add" class="btn btn-amber btn-sm"><i class="fa-solid fa-user-plus"></i> RECRUIT</button>
           </span>
+        </div>
+        <div id="war-room-bar" class="war-room-bar hidden">
+          <span class="war-room-label">TARGET COHORT:</span>
+          <label class="lbl-inline"><input type="checkbox" class="war-filter" value="general"> <i class="fa-solid fa-star" style="color:var(--amber)"></i> GENERALS</label>
+          <label class="lbl-inline"><input type="checkbox" class="war-filter" value="journalist"> <i class="fa-solid fa-newspaper" style="color:var(--blue)"></i> JOURNALISTS</label>
+          <label class="lbl-inline"><input type="checkbox" class="war-filter" value="academic"> <i class="fa-solid fa-graduation-cap" style="color:#b08be8"></i> ACADEMICS</label>
+          <label class="lbl-inline"><input type="checkbox" class="war-filter" value="organizer"> <i class="fa-solid fa-person-walking" style="color:var(--green)"></i> ORGANIZERS</label>
+          <button id="war-mobilise" class="btn btn-amber btn-sm" style="margin-left:auto"><i class="fa-solid fa-envelope"></i> COPY EMAILS</button>
         </div>
         <div id="net-roster" class="roster-grid pad"></div>
       </div>
@@ -208,15 +231,15 @@
   <div id="spotlight-root"></div>
 
   <!-- Modular frontend: distinct script tags, no bundler -->
-  <script src="js/util.js?v=1.0.0"></script>
-  <script src="js/crypto.js?v=1.0.0"></script>
-  <script src="js/data.js?v=1.0.0"></script>
-  <script src="js/audio.js?v=1.0.0"></script>
-  <script src="js/exocortex.js?v=1.0.0"></script>
-  <script src="js/ops.js?v=1.0.0"></script>
-  <script src="js/network.js?v=1.0.0"></script>
-  <script src="js/airlock.js?v=1.0.0"></script>
-  <script src="js/onboarding.js?v=1.0.0"></script>
-  <script src="js/app.js?v=1.0.0"></script>
+  <script src="js/util.js?v=1.1.0"></script>
+  <script src="js/crypto.js?v=1.1.0"></script>
+  <script src="js/data.js?v=1.1.0"></script>
+  <script src="js/audio.js?v=1.1.0"></script>
+  <script src="js/exocortex.js?v=1.1.0"></script>
+  <script src="js/ops.js?v=1.1.0"></script>
+  <script src="js/network.js?v=1.1.0"></script>
+  <script src="js/airlock.js?v=1.1.0"></script>
+  <script src="js/onboarding.js?v=1.1.0"></script>
+  <script src="js/app.js?v=1.1.0"></script>
 </body>
 </html>

@@ -7,6 +7,21 @@ const Net = (() => {
 
   const $ = id => document.getElementById(id);
   let nodePositions = [];   // {x,y,r,kind:'hq'|'agent'|'sector',ref}
+  let warRoom = false;      // cohort-targeting mode
+
+  /* Archetype taxonomy (Party Whip prototype): strategic classification of
+     network roles. Free-text roles still work; these four get icons + accents. */
+  const ARCHETYPES = {
+    organizer:  { label: 'Organizer',  icon: 'fa-person-walking',   hint: 'Foot soldier — executes missions' },
+    academic:   { label: 'Academic',   icon: 'fa-graduation-cap',   hint: 'Theory provider' },
+    journalist: { label: 'Journalist', icon: 'fa-newspaper',        hint: 'Narrative amplifier' },
+    general:    { label: 'General',    icon: 'fa-star',             hint: 'High-value strategic ally' },
+  };
+
+  function archetypeOf(v) {
+    const r = (v.role || '').toLowerCase();
+    return ARCHETYPES[r] ? r : null;
+  }
 
   function vols() { return Data.state.volunteers; }
 
@@ -23,26 +38,61 @@ const Net = (() => {
 
   function renderRoster() {
     const q = $('net-search').value.trim().toLowerCase();
-    const list = vols().filter(v => !q ||
+    let list = vols().filter(v => !q ||
       (v.handle + ' ' + v.email + ' ' + v.location + ' ' + v.role + ' ' + (v.skills || []).join(' '))
         .toLowerCase().includes(q));
-    $('net-roster').innerHTML = list.map(v => `
-      <div class="agent-card" data-id="${v.id}">
+    if (warRoom) {
+      const cohort = [...document.querySelectorAll('.war-filter:checked')].map(c => c.value);
+      if (cohort.length) list = list.filter(v => cohort.includes(archetypeOf(v)));
+    }
+    $('net-roster').innerHTML = list.map(v => {
+      const arch = archetypeOf(v);
+      const a = arch ? ARCHETYPES[arch] : null;
+      return `
+      <div class="agent-card ${arch ? 'arch-' + arch : ''}" data-id="${v.id}" data-email="${U.esc(v.email)}">
         <div class="agent-head">
-          <span class="agent-handle"><i class="fa-solid fa-user-secret"></i> ${U.esc(v.handle)}</span>
+          <span class="agent-handle"><i class="fa-solid ${a ? a.icon : 'fa-user-secret'}"></i> ${U.esc(v.handle)}</span>
           ${relBadge(v.reliabilityScore)}
         </div>
         <div class="agent-meta">
-          <span class="chip">${U.esc(v.role || 'volunteer')}</span>
+          <span class="chip ${arch ? 'chip-arch-' + arch : ''}" ${a ? `title="${a.hint}"` : ''}>${U.esc(v.role || 'volunteer')}</span>
           <span class="chip"><i class="fa-solid fa-location-dot"></i> ${U.esc(v.location || '—')}</span>
           <span class="chip chip-xp">LVL ${level(v.xp)} · ${v.xp || 0} XP</span>
         </div>
         <div class="agent-skills">${(v.skills || []).map(s => `<span class="chip">${U.esc(s)}</span>`).join('') || '<span class="dim">no skills logged</span>'}</div>
         ${v.notes ? `<div class="agent-notes dim">${U.esc(v.notes)}</div>` : ''}
-      </div>`).join('') || '<p class="dim pad">No agents yet. Add one or import a CSV.</p>';
+      </div>`;
+    }).join('') || `<p class="dim pad">${warRoom ? 'No agents match the targeted cohort.' : 'No agents yet. Add one or import a CSV.'}</p>`;
     $('net-roster').querySelectorAll('.agent-card').forEach(c =>
       c.addEventListener('click', () => editDialog(vols().find(v => v.id === c.dataset.id))));
-    $('net-count').textContent = vols().length;
+    $('net-count').textContent = warRoom ? `${list.length}/${vols().length}` : vols().length;
+  }
+
+  /* ---------- war room: cohort targeting + mobilisation ---------- */
+
+  function toggleWarRoom() {
+    warRoom = !warRoom;
+    $('war-room-bar').classList.toggle('hidden', !warRoom);
+    $('net-warroom').classList.toggle('btn-amber', warRoom);
+    $('net-warroom').classList.toggle('btn-ghost', !warRoom);
+    renderRoster();
+  }
+
+  async function mobiliseCohort() {
+    const emails = [...document.querySelectorAll('#net-roster .agent-card')]
+      .map(c => c.dataset.email).filter(Boolean);
+    if (!emails.length) { U.toast('No agents (with emails) in the current view', 'warn'); return; }
+    const text = [...new Set(emails)].join(', ');
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // clipboard API needs focus/permission — fall back to the legacy path
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+    }
+    Data.logActivity('HQ', 'COHORT_MOBILISED', `${emails.length} emails copied`);
+    U.toast(`Copied ${emails.length} email address(es) — paste into BCC`, 'ok');
   }
 
   /* ---------- add / edit ---------- */
@@ -56,7 +106,10 @@ const Net = (() => {
       <label class="lbl">EMAIL</label><input class="inp" id="ag-email" value="${U.esc(v.email)}">
       <div class="grid2">
         <div><label class="lbl">LOCATION</label><input class="inp" id="ag-loc" value="${U.esc(v.location)}"></div>
-        <div><label class="lbl">ROLE</label><input class="inp" id="ag-role" value="${U.esc(v.role)}"></div>
+        <div><label class="lbl">ROLE / ARCHETYPE</label>
+          <input class="inp" id="ag-role" list="ag-role-list" value="${U.esc(v.role)}" placeholder="organizer / academic / journalist / general…">
+          <datalist id="ag-role-list">${Object.values(ARCHETYPES).map(a => `<option value="${a.label}">${a.hint}</option>`).join('')}</datalist>
+        </div>
       </div>
       <label class="lbl">SKILLS (comma separated)</label><input class="inp" id="ag-skills" value="${U.esc((v.skills || []).join(', '))}">
       <label class="lbl">NOTES</label><textarea class="inp" id="ag-notes" rows="2">${U.esc(v.notes)}</textarea>
@@ -276,6 +329,9 @@ const Net = (() => {
     $('net-add').addEventListener('click', () => editDialog(null));
     $('net-import').addEventListener('click', importDialog);
     $('net-search').addEventListener('input', renderRoster);
+    $('net-warroom').addEventListener('click', toggleWarRoom);
+    $('war-mobilise').addEventListener('click', mobiliseCohort);
+    document.querySelectorAll('.war-filter').forEach(c => c.addEventListener('change', renderRoster));
     bindTopology();
     window.addEventListener('resize', U.debounce(drawTopology, 200));
     refresh();

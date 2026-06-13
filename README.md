@@ -55,9 +55,9 @@ Approving clean work raises an agent's reliability score; flags and rejections e
 
 ## Modules
 
-- **EXOCORTEX** — markdown notes, `[[wiki links]]`, automatic backlinks + similar-note surfacing, manuscript compiler (tag → single chronological HTML for Substack), Tone.js brown/pink/rain noise.
-- **OPS** — missions with validation constraints (Trust / Evidence / Challenge), natural-language due dates ("call MP next Friday"), standing orders with midnight resets and streaks, Chart.js campaign-health dashboards, focus timer, mission pack broadcast.
-- **NETWORK** — decentralised CRM: roster with XP and reliability, bulk CSV import, interactive canvas topology graph (agents → HQ → completed sectors).
+- **EXOCORTEX** — markdown notes, `[[wiki links]]`, automatic backlinks + similar-note surfacing, a **concept graph** (notes as nodes, wiki-links as edges — click to jump), editor toolbar (bold / heading / wiki-link), manuscript compiler (tag → single chronological HTML for Substack), Tone.js brown/pink/rain noise.
+- **OPS** — missions with validation constraints (Trust / Evidence / Challenge), natural-language due dates with a live parse preview ("call MP next Friday" → 📅 19/06), standing orders with midnight resets and streaks, Chart.js campaign-health dashboards, focus timer, mission pack broadcast, and **tactical templates** — three built-in campaign packs (Social Blast / MP Pressure / Sticker Run) plus save-your-own reusable packs.
+- **NETWORK** — decentralised CRM: roster with XP and reliability, **archetype taxonomy** (Organizer / Academic / Journalist / General with colour-coded cards), the **War Room** (filter the roster to a target cohort and copy their emails for a BCC blast), bulk CSV import, interactive canvas topology graph (agents → HQ → completed sectors).
 - **AIRLOCK** — dropzone scanner, decryption, automated audits, escrow approve/reject.
 - **FRONTLINE** (`/frontline/`) — the agent PWA: offline-first service worker, IndexedDB queue, shift protocol, evidence cam with canvas compression, Pocket MMT rebuttal cards, black-box telemetry, Burn Protocol.
 

@@ -172,6 +172,85 @@ const Exo = (() => {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }
 
+  /* ---------- editor toolbar: wrap/insert at the cursor ---------- */
+
+  function insertText(before, after = '') {
+    const ta = $('exo-content');
+    if (previewMode) setPreview(false);
+    const { selectionStart: s, selectionEnd: e, value } = ta;
+    const sel = value.slice(s, e);
+    ta.value = value.slice(0, s) + before + sel + after + value.slice(e);
+    ta.focus();
+    const pos = sel ? s + before.length + sel.length + after.length : s + before.length;
+    ta.setSelectionRange(sel ? pos : pos, pos);
+    persistEdit();
+  }
+
+  /* ---------- concept graph: notes as nodes, [[wikilinks]] as edges ---------- */
+
+  let graphNodes = [];
+
+  function conceptGraph() {
+    const ns = notes();
+    if (!ns.length) { U.toast('No notes to graph yet', 'warn'); return;}
+    const body = U.el('div');
+    body.innerHTML = `<canvas id="exo-graph" width="820" height="520" style="width:100%;background:#0f1119;border-radius:8px;cursor:pointer"></canvas>
+      <p class="dim" style="margin:6px 0 0">Edges are [[wiki links]]. Click a node to open the note.</p>`;
+    const modal = U.modal({
+      title: 'CONCEPT GRAPH — ' + ns.length + ' NOTES', body, wide: true,
+      actions: [{ label: 'CLOSE', kind: 'ghost' }],
+    });
+
+    const canvas = body.querySelector('#exo-graph');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const byTitle = new Map(ns.map(n => [n.title.toLowerCase(), n]));
+
+    // edges from wikilinks (unresolved links are ignored — they're future notes)
+    const edges = [];
+    for (const n of ns) {
+      for (const m of n.content.matchAll(/\[\[([^\]]+)\]\]/g)) {
+        const t = byTitle.get(m[1].trim().toLowerCase());
+        if (t && t.id !== n.id) edges.push([n.id, t.id]);
+      }
+    }
+    const degree = {};
+    edges.flat().forEach(id => degree[id] = (degree[id] || 0) + 1);
+
+    // circle layout, hubs pulled toward the centre
+    graphNodes = ns.map((n, i) => {
+      const angle = (i / ns.length) * Math.PI * 2 - Math.PI / 2;
+      const pull = 1 - Math.min(0.55, (degree[n.id] || 0) * 0.12);
+      return {
+        n, x: W / 2 + Math.cos(angle) * (W / 2 - 90) * pull,
+        y: H / 2 + Math.sin(angle) * (H / 2 - 60) * pull,
+        r: 7 + Math.min(10, (degree[n.id] || 0) * 2),
+      };
+    });
+    const pos = Object.fromEntries(graphNodes.map(g => [g.n.id, g]));
+
+    ctx.strokeStyle = 'rgba(232,184,75,.45)';
+    ctx.lineWidth = 1.4;
+    for (const [a, b] of edges) {
+      ctx.beginPath(); ctx.moveTo(pos[a].x, pos[a].y); ctx.lineTo(pos[b].x, pos[b].y); ctx.stroke();
+    }
+    for (const g of graphNodes) {
+      ctx.beginPath(); ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2);
+      ctx.fillStyle = degree[g.n.id] ? '#e8b84b' : '#566074';
+      ctx.fill();
+      ctx.fillStyle = '#d8dbe2'; ctx.font = '11px Consolas, monospace'; ctx.textAlign = 'center';
+      ctx.fillText(g.n.title.slice(0, 26), g.x, g.y + g.r + 13);
+    }
+
+    canvas.addEventListener('click', e => {
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * sx, y = (e.clientY - rect.top) * sy;
+      const hit = graphNodes.find(g => (g.x - x) ** 2 + (g.y - y) ** 2 <= (g.r + 8) ** 2);
+      if (hit) { modal.close(); openNote(hit.n.id); }
+    });
+  }
+
   /* ---------- manuscript compiler ---------- */
 
   function compileDialog() {
@@ -238,6 +317,10 @@ ${articles}
     $('exo-delete').addEventListener('click', deleteActive);
     $('exo-toggle').addEventListener('click', () => setPreview(!previewMode));
     $('exo-compile').addEventListener('click', compileDialog);
+    $('exo-graph-btn').addEventListener('click', conceptGraph);
+    $('exo-bold').addEventListener('click', () => insertText('**', '**'));
+    $('exo-h1').addEventListener('click', () => insertText('# '));
+    $('exo-wikibtn').addEventListener('click', () => insertText('[[', ']]'));
     $('exo-search').addEventListener('input', refreshList);
     ['exo-title', 'exo-tags', 'exo-content'].forEach(id =>
       $(id).addEventListener('input', persistEdit));

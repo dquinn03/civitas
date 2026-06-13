@@ -238,6 +238,29 @@ select.inp, select.inp-sm { cursor: pointer; }
 .ev-thumb { max-height: 56px; border-radius: 5px; border: 1px solid var(--border); }
 .ev-click { cursor: zoom-in; }
 
+/* ---------- party whip additions ---------- */
+
+.hq-clock { font-size: 12px; color: var(--dim); margin-left: 12px; letter-spacing: 1px; font-weight: 400; }
+
+.date-preview { font-family: Consolas, monospace; font-size: 11px; color: var(--amber); padding: 2px 2px 0; }
+
+.war-room-bar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin: 0 12px; padding: 10px 12px;
+  background: #241f12; border: 1px solid #4a3f1e; border-radius: 8px;
+}
+.war-room-label { font-family: Consolas, monospace; font-size: 10.5px; letter-spacing: 1.5px; color: var(--amber); }
+.war-filter { accent-color: var(--amber); }
+
+.arch-general { border-left: 3px solid var(--amber); }
+.arch-journalist { border-left: 3px solid var(--blue); }
+.arch-academic { border-left: 3px solid #b08be8; }
+.arch-organizer { border-left: 3px solid var(--green); }
+.chip-arch-general { color: var(--amber); }
+.chip-arch-journalist { color: var(--blue); }
+.chip-arch-academic { color: #b08be8; }
+.chip-arch-organizer { color: var(--green); }
+
 /* ---------- modal & toast ---------- */
 
 .modal-overlay {

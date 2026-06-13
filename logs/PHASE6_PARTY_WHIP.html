@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 6 — Party Whip Merge (ELI5 decision log)</title>
+<style>
+ body{max-width:860px;margin:2rem auto;padding:0 1.2rem 4rem;background:#0d0f14;color:#d8dbe2;
+      font:15px/1.65 'Segoe UI',system-ui,sans-serif}
+ h1,h2,h3,h4{font-family:Consolas,'Courier New',monospace;color:#e8b84b;letter-spacing:.5px;line-height:1.3}
+ h1{border-bottom:1px solid #262b3b;padding-bottom:.35em}
+ a{color:#7aa6d8} a:hover{color:#e8b84b}
+ code{background:#151823;border:1px solid #262b3b;border-radius:4px;padding:.1em .4em;
+      font-family:Consolas,monospace;font-size:.9em}
+ pre{background:#10131b;border:1px solid #262b3b;border-radius:8px;padding:14px;overflow-x:auto}
+ pre code{background:none;border:none;padding:0}
+ blockquote{border-left:3px solid #b88d2c;margin-left:0;padding-left:14px;color:#8d96a8}
+ table{border-collapse:collapse;margin:1em 0;width:100%}
+ th,td{border:1px solid #262b3b;padding:7px 11px;text-align:left}
+ th{background:#151823;color:#e8b84b;font-family:Consolas,monospace;font-size:.85em;letter-spacing:1px}
+ tr:nth-child(even){background:#11141d}
+ hr{border:none;border-top:1px solid #262b3b;margin:2.2rem 0}
+ .src{font-size:.75em;color:#566074;border-top:1px solid #262b3b;margin-top:3rem;padding-top:.8rem;
+      font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+<h1>Phase 6 — Party Whip Merge (ELI5 decision log)</h1>
+<p><em>Build date: 13 June 2026 · v1.1.0</em></p>
+<h2>What happened</h2>
+<p>Darren supplied an earlier single-file prototype ("Civitas: Party Whip Operations"). We went through it like a parts bin: kept the good ideas, left the weak engines, and wired the keepers into the real modular system.</p>
+<h2>What got wired in, explained like you're five</h2>
+<p><strong>1. Archetypes (Organizer / Academic / Journalist / General).</strong> Before, an agent's role was just a word. Now four special words carry strategy: Organizers DO things, Academics PROVIDE theory, Journalists AMPLIFY, Generals are high-command allies. Their cards get an icon and a coloured stripe so the roster reads at a glance. Any other word still works — the taxonomy is a magnet, not a cage.</p>
+<p><strong>2. The War Room.</strong> A button that flips the roster from "phone book" to "targeting computer": tick the cohorts you want (just Generals, or Generals + Journalists), the roster narrows, and COPY EMAILS puts every visible address on the clipboard for a BCC blast. Mobilisation in three clicks.</p>
+<p><strong>3. Tactical templates (mission packs you can replay).</strong> Campaigns repeat. Three packs are built in — Social Blast, MP Pressure, Sticker Run — and SAVE PACK turns your current active missions into a named pack you can redeploy forever. One safety rule: challenge missions are saved as trust missions inside templates, because the secret pass-answer must never live inside a reusable file.</p>
+<p><strong>4. Live date preview.</strong> As you type "Call MP next Friday", a little 📅 line shows the date the parser understood — BEFORE you hit deploy. No more guessing what the machine heard.</p>
+<p><strong>5. Exocortex toolbar + concept graph.</strong> Three buttons (bold, heading, [[link]]) that wrap whatever you've selected, and a GRAPH button that draws your notes as a constellation: each note is a star, each [[wiki link]] is a line between stars, hub notes glow bigger and pull to the centre. Click a star to fly to it.</p>
+<p><strong>6. System Status panel.</strong> Vault menu → System status: how big the state is, how many of everything you have, a FULL BACKUP button, and a Factory Reset behind a double confirmation.</p>
+<p><strong>7. Cowra clock + Substack button.</strong> The header now tells the time and carries a one-click door to the publishing front.</p>
+<h2>What we deliberately did NOT take, and why</h2>
+<ul>
+<li><strong>Its markdown "engine"</strong> — it just swapped newlines for <code>&lt;br&gt;</code>. Ours parses headings, lists, quotes, code and wiki-links properly.</li>
+<li><strong>Its CSV importer</strong> — split on commas, so any quoted field with a comma exploded. Ours is quote-aware.</li>
+<li><strong>Its intake form</strong> — our RECRUIT dossier modal already does this with more fields and validation.</li>
+<li><strong>Its localStorage-only storage</strong> — the whole point of Civitas is the vault file. localStorage stays a mirror, never the truth.</li>
+<li><strong>Its missions</strong> — no constraints, no proof, no auditing. Would have reopened the exact Principal-Agent hole the Airlock closes.</li>
+</ul>
+<h2>One thing we learned while testing</h2>
+<p>Running Commander and Frontline in the SAME browser means they share the same localStorage pocket — so testing the Burn Protocol wiped the Commander's mirror copy. The vault file didn't lose a byte, which is exactly the design working: the pocket is disposable, the file is the truth. (Recorded as SPEC amendment 12.)</p>
+<p class="src">CIVITAS · generated from PHASE6_PARTY_WHIP.md by tools/md2html.py — edit the .md, not this file.</p>
+</body>
+</html>

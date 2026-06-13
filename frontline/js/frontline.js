@@ -346,6 +346,48 @@ const MMT_CARDS = [
     neu: 'The same place every dollar comes from: the currency issuer spends it into existence — exactly as money was "found" overnight for wars and bank rescues. The honest question is never the money; it\'s whether the workers, materials and energy exist. Audit the real resources, not the accounting.' },
 ];
 
+/* ================= PLATFORM CARDS — affirmative policy pitch =================
+   The 17 policy platform cards explain what we're actually building.
+   Distinct from Pocket MMT (which rebuts economic myths): these answer
+   "what will you do about housing / health / jobs?" at the doorstep. */
+
+const PLATFORM_CARDS = [
+  { n: '01', t: 'Unemployment & Job Guarantee', old: 'Unemployment is the natural price of keeping inflation low. The market will create jobs if conditions are right.',
+    neu: 'Unemployment is a deliberate policy choice — idle lives used as a price anchor. A Job Guarantee offers every willing worker a living-wage public job. Prices are anchored by the employment floor, not the dole queue.' },
+  { n: '02', t: 'Dental & Mental Health Security', old: 'Dental and mental health are extras. Budget pressures mean they can\'t be universal — private insurance should fill the gap.',
+    neu: 'Oral and mental health are inseparable from physical health. A tooth infection or untreated depression costs more than the clinic. The currency issuer can fund any clinic it chooses — the constraints are trained workers and equipment, never the accounting.' },
+  { n: '03', t: 'Housing', old: 'The market will build enough homes if we cut red tape. Negative gearing rewards investors who increase supply.',
+    neu: 'Shelter is a public utility, not an asset class. Negative gearing is a tax expenditure worth billions annually — it inflates prices and transfers wealth upward. Government can direct spending to build social housing at scale; the constraint is construction workers, not money.' },
+  { n: '04', t: 'Welfare & Income Support', old: 'Welfare creates dependency and is unsustainable. Mutual obligation keeps people job-ready.',
+    neu: 'Income support is automatic fiscal stabilisation — it flows when private incomes fall and contracts as they recover. The strongest floor is a Job Guarantee: a guaranteed living-wage job for anyone who wants one. Top-up payments cover those who can\'t work.' },
+  { n: '05', t: 'Education Cost', old: 'Students should contribute to the cost of their education — it\'s an investment in themselves.',
+    neu: 'An educated population is a public good that pays dividends to the whole community. The currency issuer has no revenue constraint on education spending. The real question is whether we have enough teachers and classrooms. We do.' },
+  { n: '06', t: 'HECS & Student Debt', old: 'HECS is manageable — you only repay above the threshold. It\'s reasonable cost-sharing.',
+    neu: 'Student debt is a lifetime tax on curiosity and public-sector careers. The government that created the dollars also created the debt — it can cancel both with a ledger entry. The real cost of education is training teachers and building schools, not accounting entries.' },
+  { n: '07', t: 'Finding Work & Employment Services', old: 'Job seekers need to try harder and meet obligations. Privatised agencies provide efficiency in placement.',
+    neu: 'In a demand-constrained economy there are always more seekers than vacancies — compliance doesn\'t create jobs. A restored Commonwealth Employment Service matches skills to real work and pairs with the Job Guarantee so there is always a vacancy to offer.' },
+  { n: '08', t: 'Banking & Public Finance', old: 'Private banks serve the market efficiently. A public bank would be politically captured and distort credit.',
+    neu: 'Private banks direct credit wherever it\'s most profitable — often existing asset prices, not new capacity. A public bank directs credit toward housing, climate infrastructure and regional development where private banks won\'t go.' },
+  { n: '09', t: 'The Economy & Fiscal Policy', old: 'A balanced budget is responsible government. Deficits crowd out private investment.',
+    neu: 'The government\'s deficit is the non-government sector\'s surplus — accounting arithmetic. A currency issuer that forces surpluses during a slowdown withdraws spending power from households. The real constraint is inflation, not the ledger.' },
+  { n: '10', t: 'Renewables & Public Energy', old: 'Renewables are too expensive and unreliable without market price signals. Subsidies distort investment.',
+    neu: 'The sun and wind are free — the cost is turbines, cables and engineers. A currency-issuing government can fund a grid transformation at will. Public ownership means the public captures the free fuel dividend instead of shareholders.' },
+  { n: '11', t: 'Just Transition', old: 'We can\'t destroy coal communities for climate ideology. The jobs will vanish and towns will be abandoned.',
+    neu: 'The government can guarantee every coal and gas worker a new public-sector job before the pit closes — at the same wage, in the same town where possible. A just transition is the Job Guarantee applied sector by sector.' },
+  { n: '12', t: 'Fast Rail', old: 'Fast rail costs hundreds of billions — a fantasy we can\'t afford in the current fiscal environment.',
+    neu: 'Australia has had the engineers, steel and flat corridors for decades. The currency issuer spends infrastructure into existence; the constraint is scheduling the workforce — not finding the money. Every year of delay is a policy choice, not a financial necessity.' },
+  { n: '13', t: 'Regional Transport', old: 'Regional bus and rail lines lose money — the market should decide what services are viable.',
+    neu: 'Public transport is social infrastructure, not a profit centre. No service means isolation, structural unemployment and worse health outcomes — all of which cost more in the long run. Regional communities deserve the same connectivity as inner-city suburbs.' },
+  { n: '14', t: 'Power Bills & Energy Guarantee', old: 'High power bills are a market problem — the solution is more competition, not government price intervention.',
+    neu: 'Electricity is a natural monopoly — "competition" in transmission is a fiction. Public ownership gives direct control of the price. An energy price guarantee — a regulated maximum — ends energy poverty and anchors inflation in a single move.' },
+  { n: '15', t: 'Food Security', old: 'Imported food is cheaper — global markets handle supply more efficiently than government programs.',
+    neu: 'Supply chains are fragile — pandemics and trade wars prove it instantly. Domestic food production is a strategic sovereign asset. Government can support small-farm production and regional food infrastructure without any accounting constraint.' },
+  { n: '16', t: 'Indigenous Justice & Self-Determination', old: 'Closing the Gap needs better-targeted programs with community accountability. We can\'t afford open-ended commitments.',
+    neu: 'Self-determination means communities control their own resources and futures. The constraints on mob-controlled enterprises and community services are political will and trained people — not money. Treaty is the framework that makes everything else legitimate.' },
+  { n: '17', t: 'Farming & Agricultural Transition', old: 'Family farms must compete in global commodity markets without subsidies — that\'s what free trade requires.',
+    neu: 'Food sovereignty is a strategic asset — farmers are the frontline of national resilience. Government can fund climate-adapted farming research, water infrastructure and ecological transition without any revenue limit. The constraints are agronomists and engineers, not accounting entries. Cowra knows this.' },
+];
+
 /* ================= dispatch (field -> HQ) ================= */
 
 async function buildDispatch() {
@@ -540,6 +582,29 @@ async function renderView() {
       await copyText(c.neu);
       Tel.log('mmt:copy:' + c.n);
       b.textContent = '✓ COPIED'; setTimeout(() => b.textContent = '⧉ COPY REBUTTAL', 1800);
+    }));
+
+  } else if (view === 'platform') {
+    host.innerHTML = `
+      <div class="card"><h3>Platform Cards</h3>
+      <p class="dim">What we're actually building — the affirmative pitch for the doorstep. 17 policy areas in plain language.</p>
+      <p class="dim">Pair these with Pocket MMT: MMT answers <em>why the money exists</em>, Platform cards answer <em>what we'll do with it</em>.</p></div>
+      ${PLATFORM_CARDS.map((c, i) => `
+        <div class="acc">
+          <button class="acc-head"><span><span class="num">${c.n}</span>${esc(c.t)}</span><span>▾</span></button>
+          <div class="acc-body">
+            <div class="oldway"><b>OLD WAY:</b> ${esc(c.old)}</div>
+            <div class="newway"><b>NEW WAY:</b> ${esc(c.neu)}</div>
+            <button class="btn" data-platarg="${i}">⧉ COPY NEW WAY</button>
+          </div>
+        </div>`).join('')}`;
+    host.querySelectorAll('.acc-head').forEach(h =>
+      h.addEventListener('click', () => h.parentElement.classList.toggle('acc-open')));
+    host.querySelectorAll('[data-platarg]').forEach(b => b.addEventListener('click', async () => {
+      const c = PLATFORM_CARDS[+b.dataset.platarg];
+      await copyText(c.neu);
+      Tel.log('platform:copy:' + c.n);
+      b.textContent = '✓ COPIED'; setTimeout(() => b.textContent = '⧉ COPY NEW WAY', 1800);
     }));
 
   } else if (view === 'dispatch') {

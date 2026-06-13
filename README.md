@@ -59,7 +59,7 @@ Approving clean work raises an agent's reliability score; flags and rejections e
 - **OPS** — missions with validation constraints (Trust / Evidence / Challenge), natural-language due dates with a live parse preview ("call MP next Friday" → 📅 19/06), standing orders with midnight resets and streaks, Chart.js campaign-health dashboards, focus timer, mission pack broadcast, and **tactical templates** — three built-in campaign packs (Social Blast / MP Pressure / Sticker Run) plus save-your-own reusable packs.
 - **NETWORK** — decentralised CRM: roster with XP and reliability, **archetype taxonomy** (Organizer / Academic / Journalist / General with colour-coded cards), the **War Room** (filter the roster to a target cohort and copy their emails for a BCC blast), bulk CSV import, interactive canvas topology graph (agents → HQ → completed sectors).
 - **AIRLOCK** — dropzone scanner, decryption, automated audits, escrow approve/reject.
-- **FRONTLINE** (`/frontline/`) — the agent PWA: offline-first service worker, IndexedDB queue, shift protocol with a live ON-DUTY ticker, evidence cam with canvas compression, briefings by file or paste (Signal-friendly), dispatches by sync-folder file or copy-paste of the sealed ciphertext, 9 Pocket MMT rebuttal cards with one-tap copy for online arguments, black-box telemetry, a Field Simulation trainer that demonstrates HQ's audit flags, and the Burn Protocol. Zero external dependencies — black spots can't touch it.
+- **FRONTLINE** (`/frontline/`) — the agent PWA: offline-first service worker, IndexedDB queue, shift protocol with a live ON-DUTY ticker, evidence cam with canvas compression, briefings by file or paste (Signal-friendly), dispatches by sync-folder file or copy-paste of the sealed ciphertext, **9 Pocket MMT rebuttal cards** (epistemological answers to monetary myths) + **17 Platform cards** (the affirmative policy pitch — what we're actually building, one-tap copy for online arguments), black-box telemetry, a Field Simulation trainer that demonstrates HQ's audit flags, and the Burn Protocol. Zero external dependencies — black spots can't touch it.
 
 ## Tech constraints (deliberate, permanent)
 
@@ -73,6 +73,7 @@ Approving clean work raises an agent's reliability score; flags and rejections e
 |------|------|
 | `index.html` + `js/` + `css/` | Commander Terminal |
 | `frontline/` | Agent PWA (standalone) |
+| `campaign/cards.html` | 17 print-ready policy platform cards (fold-and-cut, A4 landscape) |
 | `docs/SPEC.md` | Full blueprint incl. amendments made during the build |
 | `logs/PHASE*.md` | ELI5 decision logs, one per build phase |
 | `samples/` | Demo master state, mission pack, dispatch |

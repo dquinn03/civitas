@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 8 — Campaign Cards Integration (ELI5 decision log)</title>
+<style>
+ body{max-width:860px;margin:2rem auto;padding:0 1.2rem 4rem;background:#0d0f14;color:#d8dbe2;
+      font:15px/1.65 'Segoe UI',system-ui,sans-serif}
+ h1,h2,h3,h4{font-family:Consolas,'Courier New',monospace;color:#e8b84b;letter-spacing:.5px;line-height:1.3}
+ h1{border-bottom:1px solid #262b3b;padding-bottom:.35em}
+ a{color:#7aa6d8} a:hover{color:#e8b84b}
+ code{background:#151823;border:1px solid #262b3b;border-radius:4px;padding:.1em .4em;
+      font-family:Consolas,monospace;font-size:.9em}
+ pre{background:#10131b;border:1px solid #262b3b;border-radius:8px;padding:14px;overflow-x:auto}
+ pre code{background:none;border:none;padding:0}
+ blockquote{border-left:3px solid #b88d2c;margin-left:0;padding-left:14px;color:#8d96a8}
+ table{border-collapse:collapse;margin:1em 0;width:100%}
+ th,td{border:1px solid #262b3b;padding:7px 11px;text-align:left}
+ th{background:#151823;color:#e8b84b;font-family:Consolas,monospace;font-size:.85em;letter-spacing:1px}
+ tr:nth-child(even){background:#11141d}
+ hr{border:none;border-top:1px solid #262b3b;margin:2.2rem 0}
+ .src{font-size:.75em;color:#566074;border-top:1px solid #262b3b;margin-top:3rem;padding-top:.8rem;
+      font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+<h1>Phase 8 — Campaign Cards Integration (ELI5 decision log)</h1>
+<p><em>Build date: 13 June 2026 · v1.1.2</em></p>
+<h2>What happened</h2>
+<p>Third parts-bin pass: Darren supplied "Fightback 2.0 — Campaign Cards (Print Ready)", a standalone HTML page of 17 fold-and-cut policy cards in "Old Way vs New Way" format. Same drill as Phases 6 and 7 — extract what's genuinely useful, wire it in properly, refuse the weak machinery.</p>
+<h2>What got wired in, explained like you're five</h2>
+<p><strong>1. The print-ready card gallery (<code>campaign/cards.html</code>).</strong> A standalone page served from the same localhost as the Commander. Screen view: dark terminal theme, 17 cards in a 2-column grid. Print view (<code>Ctrl+P</code> or the ⎙ PRINT button): the dark theme strips away to white, each card gets a dashed fold-and-cut border, two cards side by side on A4 landscape. You print, cut, fold — done. The CARDS button in the Commander header opens it in a new tab.</p>
+<p>Why a separate page? Because print is a different medium entirely. A modal inside the Commander would be the wrong tool — you'd have to scroll through all of it to find what you want, and the print layout would fight the app chrome. A dedicated page is a one-purpose tool that can be handed off: bookmark it, save it, email the URL to a volunteer and they can print their own pack.</p>
+<p><strong>2. The Platform tab in Frontline.</strong> Frontline already had Pocket MMT (9 rebuttal cards: when someone says "printing money causes inflation" or "the grandkids will pay for it", you have the MMT response). Platform is different — it's the affirmative pitch. "What will you do about unemployment?" gets a Platform card; "but how do you pay for it?" gets an MMT card.</p>
+<p>The 17 platform cards live in a fifth nav tab (⚑ PLATFORM) between POCKET MMT and DISPATCH. Same accordion pattern as the MMT tab: tap the topic to expand it, Old Way on the left, New Way on the right, one-tap copy button puts the New Way text on the clipboard for online arguments.</p>
+<p>Why a fifth tab? Four was already tight. But the Platform is a distinct layer of the argument — one answers the epistemological/monetary questions, the other answers the substantive policy questions. Merging them into a single 26-card accordion would make both harder to find and blur the distinction between "why the money exists" and "what we'll do with it". Separate tabs, separate purposes.</p>
+<p><strong>3. Telemetry hooks.</strong> Platform card copies are logged to the black-box telemetry array as <code>platform:copy:01</code> etc., exactly like MMT card copies. This lets Darren see which platform cards get the most field use — a real-world signal for where the arguments land and where more training is needed.</p>
+<h2>What we deliberately did NOT take</h2>
+<ul>
+<li><strong>Its Google Fonts CDN import</strong> — Frontline has zero external dependencies (no CDN ever; must work in black spots). The campaign/cards.html Commander page could use it, but system fonts work equally well and are lighter.</li>
+<li><strong>Its print-specific JavaScript</strong> — the prototype used JS to clone and rearrange DOM for printing. CSS <code>@media print</code> handles everything we need without the complexity, and it degrades cleanly if JS is disabled.</li>
+</ul>
+<h2>The two-card-type system, explained</h2>
+<table><tr><th></th><th>Pocket MMT</th><th>Platform Cards</th></tr><tr><td>Question answered</td><td>"Why does the money even exist?"</td><td>"What will you do with it?"</td></tr><tr><td>Argument type</td><td>Epistemological / monetary theory</td><td>Substantive policy</td></tr><tr><td>Example trigger</td><td>"Won't that cause inflation?"</td><td>"What about housing?"</td></tr><tr><td>Count</td><td>9</td><td>17</td></tr><tr><td>Location</td><td>Frontline MMT tab</td><td>Frontline PLATFORM tab + campaign/cards.html</td></tr></table>
+<p>They're complementary, not redundant. A volunteer needs both: the Platform card to explain what we're proposing, the MMT card when the standard objection ("but where does the money come from?") lands.</p>
+<h2>Bookkeeping</h2>
+<p>Service worker bumped to <code>civitas-frontline-v3</code> so installed PWAs pull the new shell with the 5th tab. Commander CSS version bumped to <code>?v=1.1.2</code>. Recorded as SPEC amendment 14.</p>
+<p class="src">CIVITAS · generated from PHASE8_CAMPAIGN_CARDS.md by tools/md2html.py — edit the .md, not this file.</p>
+</body>
+</html>

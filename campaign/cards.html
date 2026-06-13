@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CIVITAS — Campaign Cards (Print Ready)</title>
+  <style>
+    /* ======= SCREEN THEME ======= */
+    :root {
+      --bg: #0d0d0d; --panel: #111; --border: #1e1e1e;
+      --amber: #ffd700; --red: #e08585; --green: #6fc28a; --dim: #888;
+    }
+    * { box-sizing: border-box; }
+    body { background: var(--bg); color: #e4e7ee; font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 0; }
+
+    header {
+      background: #111; border-bottom: 1px solid #1e1e1e; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand { font-family: ui-monospace, Consolas, monospace; font-weight: 700; letter-spacing: 2px; color: var(--amber); font-size: 18px; }
+    .brand sub { font-size: 11px; letter-spacing: 1px; color: var(--dim); font-weight: 400; }
+    .print-btn {
+      font-family: ui-monospace, Consolas, monospace; letter-spacing: 1px; font-size: 13px;
+      border-radius: 8px; border: 1px solid var(--amber); background: transparent; color: var(--amber);
+      padding: 9px 18px; cursor: pointer;
+    }
+    .print-btn:hover { background: var(--amber); color: #1a1200; }
+    .back-link {
+      font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--dim);
+      text-decoration: none; letter-spacing: 1px;
+    }
+    .back-link:hover { color: var(--amber); }
+
+    .intro { max-width: 900px; margin: 24px auto; padding: 0 24px; color: var(--dim); font-size: 14px; }
+    .intro b { color: #e4e7ee; }
+
+    /* ======= CARD GRID (screen) ======= */
+    .card-grid {
+      max-width: 1100px; margin: 0 auto; padding: 16px 24px 48px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 16px;
+    }
+    .campaign-card {
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      display: grid; grid-template-columns: 1fr 1fr;
+    }
+    .card-num {
+      grid-column: 1 / -1; background: #151515; border-bottom: 1px solid var(--border);
+      padding: 8px 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .card-num .num { font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--amber); }
+    .card-num .title { font-weight: 700; font-size: 14px; }
+    .old-side { background: #1a0e0e; border-right: 1px solid var(--border); padding: 12px 14px; }
+    .new-side { background: #0e1a12; padding: 12px 14px; }
+    .side-label { font-family: ui-monospace, Consolas, monospace; font-size: 10px; letter-spacing: 2px; margin-bottom: 6px; }
+    .old-side .side-label { color: var(--red); }
+    .new-side .side-label { color: var(--green); }
+    .side-body { font-size: 13px; line-height: 1.5; }
+
+    /* ======= PRINT STYLES ======= */
+    @media print {
+      @page { size: A4 landscape; margin: 8mm; }
+      body { background: #fff !important; color: #111 !important; }
+      header, .intro, .print-btn, .back-link { display: none !important; }
+      .card-grid {
+        display: block; padding: 0; max-width: none; margin: 0;
+      }
+      .campaign-card {
+        width: 48%; display: inline-grid; margin: 0 1% 2% 1%;
+        border: 1.5px dashed #aaa; border-radius: 0;
+        break-inside: avoid; page-break-inside: avoid;
+        vertical-align: top;
+      }
+      .card-num { background: #f8f8f8 !important; border-bottom: 1px solid #ccc !important; }
+      .card-num .num { color: #c8930a !important; }
+      .card-num .title { color: #111 !important; }
+      .old-side { background: #fff5f5 !important; border-right: 1px dashed #d99 !important; }
+      .new-side { background: #f5fff8 !important; }
+      .old-side .side-label { color: #b03030 !important; }
+      .new-side .side-label { color: #207040 !important; }
+      .side-body { font-size: 11px !important; color: #222 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">▰ CIVITAS <sub>// CAMPAIGN CARDS</sub></div>
+  </div>
+  <div style="display:flex;gap:16px;align-items:center">
+    <a href="../index.html" class="back-link">← COMMANDER</a>
+    <button class="print-btn" onclick="window.print()">⎙ PRINT CARDS</button>
+  </div>
+</header>
+
+<div class="intro">
+  <b>17 policy platform cards — fold-and-cut.</b>
+  Print this page (A4 landscape), cut along the dashed borders. Each card has an
+  <b style="color:#e08585">OLD WAY</b> (what they'll say) and a <b style="color:#6fc28a">NEW WAY</b> (your answer).
+  Use alongside the Pocket MMT rebuttal cards on the Frontline PWA.
+</div>
+
+<div class="card-grid">
+
+  <!-- 01 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">01</span><span class="title">Unemployment &amp; Job Guarantee</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Unemployment is the natural, necessary price of keeping inflation low. The market will create jobs if we get conditions right.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Unemployment is a deliberate policy choice — the government uses idle lives as its price anchor. A Job Guarantee creates a buffer stock of <em>employed</em> people: every willing worker gets a living-wage public job. Prices are anchored by the floor, not the dole queue.</div>
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">02</span><span class="title">Dental &amp; Mental Health Security</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Dental and mental health are extras — unfortunate budget pressures mean they can't be universal. Private insurance should fill the gap.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Oral and mental health are inseparable from physical health. A tooth infection or untreated depression costs the economy far more than the clinic. The currency issuer can fund any clinic it chooses — the real constraints are trained workers, equipment and facilities, never the accounting.</div>
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">03</span><span class="title">Housing</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">The market will build enough homes if we cut red tape. Negative gearing rewards the investors who take the risk and increase supply.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Shelter is a public utility, not an asset class. Negative gearing is a tax expenditure worth billions annually — it inflates prices and transfers wealth upward. Government can direct spending to build social housing at scale; the constraint is construction workers and materials, not money.</div>
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">04</span><span class="title">Welfare &amp; Income Support</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Welfare creates dependency and is unsustainable. We need targeted payments and mutual obligation to keep people job-ready.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Income support is automatic fiscal stabilisation — it flows when private incomes fall and contracts as they recover. The strongest income floor is a Job Guarantee: a guaranteed living-wage job for anyone who wants one. Top-up payments cover those who can't work. Compliance regimes don't create jobs.</div>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">05</span><span class="title">Education Cost</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Students should contribute to the cost of their education — it's an investment in themselves and they'll earn more for it.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">An educated population is a public good that pays dividends to the entire community — not just the graduate. The currency issuer has no revenue constraint on education spending. The real question is whether we have enough teachers, classrooms and learning materials. We do.</div>
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">06</span><span class="title">HECS &amp; Student Debt</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">HECS is manageable — you only repay when you earn above the threshold. It's a reasonable cost-sharing arrangement.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Student debt is a lifetime tax on curiosity, risk-taking and public-sector careers. The government that created the dollars also created the debt — it can cancel both with a ledger entry. The real cost of education is training teachers and building schools, not accounting entries. Debt cancellation costs nothing in real terms.</div>
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">07</span><span class="title">Finding Work &amp; Employment Services</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Job seekers need to try harder and meet obligations. Privatised job agencies provide competition and efficiency in placement.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">In a demand-constrained economy there are always more seekers than vacancies — compliance regimes don't create jobs, they humiliate people for a structural failure. A restored Commonwealth Employment Service matches skills to real work and pairs with the Job Guarantee so there is always a vacancy to offer.</div>
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">08</span><span class="title">Banking &amp; Public Finance</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Private banks serve the market efficiently. A public bank would be inefficient, politically captured and distort credit allocation.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Private banks create money through lending and direct it wherever is most profitable — often existing asset prices, not new productive capacity. A public bank directs credit toward housing, climate infrastructure and regional development where private banks won't go. It existed before; it can exist again.</div>
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">09</span><span class="title">The Economy &amp; Fiscal Policy</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">A balanced budget is responsible government. Deficits crowd out private investment and leave debt for future generations.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">The government's financial deficit is the non-government sector's surplus — accounting arithmetic. A currency issuer that forces surpluses during a slowdown withdraws spending power from households. The real constraint is inflation, not the ledger. Run the deficit the economy needs to keep people employed.</div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">10</span><span class="title">Renewables &amp; Public Energy</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Renewable energy is too expensive and unreliable without market price signals. Subsidies distort investment decisions.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">The sun and wind are free — the cost is turbines, cables and engineers. A currency-issuing government can fund a grid transformation at will. Public ownership of generation and transmission means the public captures the free fuel dividend instead of private shareholders.</div>
+    </div>
+  </div>
+
+  <!-- 11 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">11</span><span class="title">Just Transition</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">We can't destroy coal communities for climate ideology. The jobs will vanish and regional towns will be abandoned.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">The government can guarantee every coal and gas worker a new public-sector job before the pit closes — at the same wage, in the same town where possible. A just transition is the Job Guarantee applied sector by sector, funded by the currency issuer at no accounting limit.</div>
+    </div>
+  </div>
+
+  <!-- 12 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">12</span><span class="title">Fast Rail</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Fast rail costs hundreds of billions — it's a fantasy we simply cannot afford in the current fiscal environment.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Australia has had the engineers, the steel, the flat corridors and the right-of-way for decades. The currency issuer spends infrastructure into existence; the constraint is scheduling the construction workforce — not finding the money. Every year of delay is a deliberate policy choice, not a financial necessity.</div>
+    </div>
+  </div>
+
+  <!-- 13 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">13</span><span class="title">Regional Transport</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Regional bus and rail lines lose money — the government can't subsidise unviable services indefinitely. Let the market decide.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Public transport is social infrastructure, not a profit centre. The real cost of no service is isolation, structural unemployment and health outcomes — all of which cost the public sector more in the long run. Regional communities like ours deserve the same connectivity as inner-city suburbs.</div>
+    </div>
+  </div>
+
+  <!-- 14 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">14</span><span class="title">Power Bills &amp; Energy Guarantee</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">High power bills are a market problem — the solution is more competition, not government intervention in pricing.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Electricity is a natural monopoly — "competition" in transmission is a fiction. Public ownership gives government direct control of the price. An energy price guarantee — a regulated maximum — protects households, anchors inflation expectations and ends energy poverty in one move.</div>
+    </div>
+  </div>
+
+  <!-- 15 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">15</span><span class="title">Food Security</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Imported food is cheaper — global markets handle supply more efficiently than government programs ever could.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Supply chains are fragile — pandemics and trade wars prove it instantly. Domestic food production capacity is a sovereign strategic asset. Government can support small-farm production, regional food processing and grain reserves without any accounting constraint; the real limits are land, water and agronomists.</div>
+    </div>
+  </div>
+
+  <!-- 16 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">16</span><span class="title">Indigenous Justice &amp; Self-Determination</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Closing the Gap needs better-targeted programs with community accountability. We can't afford open-ended commitments.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Self-determination means communities control their own resources, institutions and futures. The constraints on mob-controlled enterprises, community legal services and land management are political will and trained people — not money. Treaty is the framework that makes everything else legitimate. The currency issuer can fund it.</div>
+    </div>
+  </div>
+
+  <!-- 17 -->
+  <div class="campaign-card">
+    <div class="card-num"><span class="num">17</span><span class="title">Farming &amp; Agricultural Transition</span></div>
+    <div class="old-side">
+      <div class="side-label">OLD WAY</div>
+      <div class="side-body">Family farms must compete in global commodity markets without subsidies. That's what free trade requires and it drives efficiency.</div>
+    </div>
+    <div class="new-side">
+      <div class="side-label">NEW WAY</div>
+      <div class="side-body">Food sovereignty is a strategic asset — farmers are the frontline of national resilience. Government can fund climate-adapted farming research, water infrastructure, soil health programs and ecological transition without any revenue limit. The constraints are agronomists, water engineers and seed banks — not accounting entries. Cowra knows this.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // keyboard shortcut for print
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+      e.preventDefault(); window.print();
+    }
+  });
+</script>
+</body>
+</html>

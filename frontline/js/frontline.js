@@ -57,6 +57,16 @@ const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').re
 const fmtT = ts => ts ? new Date(ts).toLocaleString('en-AU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
 const fmtDur = s => { s = Math.max(0, Math.round(s)); const h = (s / 3600) | 0, m = ((s % 3600) / 60) | 0; return h ? `${h}h ${m}m` : `${m}m ${s % 60}s`; };
 
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  toast('Copied to clipboard', 'ok');
+}
+
 function toast(msg, kind = 'info') {
   const root = document.getElementById('toast-root');
   const t = document.createElement('div');
@@ -162,14 +172,30 @@ async function toggleShift() {
   renderShift();
 }
 
+let shiftTick = null;
+
+function updateShiftClock() {
+  const cur = currentShift();
+  if (!cur) return;
+  const d = Math.floor((Date.now() - cur.start) / 1000);
+  const p = n => String(n).padStart(2, '0');
+  document.getElementById('shift-time').textContent =
+    `ON DUTY ${p((d / 3600) | 0)}:${p(((d % 3600) / 60) | 0)}:${p(d % 60)}` + (cur.geo ? ' · 📍 locked' : '');
+}
+
 function renderShift() {
   const bar = document.getElementById('shift-bar');
   const cur = currentShift();
   bar.classList.toggle('shift-on', !!cur);
   document.getElementById('shift-label').textContent = cur ? '● ON SHIFT' : 'OFF SHIFT';
   document.getElementById('shift-btn').textContent = cur ? 'END SHIFT' : 'START SHIFT';
-  document.getElementById('shift-time').textContent = cur
-    ? 'since ' + fmtT(cur.start) + (cur.geo ? ' · 📍 locked' : '') : 'hours are bounded by Start/End';
+  if (cur) {
+    updateShiftClock();
+    if (!shiftTick) shiftTick = setInterval(updateShiftClock, 1000);
+  } else {
+    clearInterval(shiftTick); shiftTick = null;
+    document.getElementById('shift-time').textContent = 'hours are bounded by Start/End';
+  }
 }
 
 /* ================= evidence cam: canvas compression =================
@@ -200,9 +226,9 @@ async function compressImage(file, maxDim = 1280, targetB64 = 400_000) {
 
 /* ================= mission pack import & queue ================= */
 
-async function importPackFile(file) {
+async function importPackText(text) {
   try {
-    const pack = JSON.parse(await file.text());
+    const pack = JSON.parse(text);
     if (pack.kind !== 'civitas-missionpack' || !Array.isArray(pack.missions)) {
       toast('Not a Civitas mission pack', 'error'); return;
     }
@@ -213,6 +239,10 @@ async function importPackFile(file) {
     toast(`Briefing received: ${pack.missions.length} missions from ${pack.hq || 'HQ'}`, 'ok');
     renderView();
   } catch (e) { toast('Pack import failed: ' + e.message, 'error'); }
+}
+
+async function importPackFile(file) {
+  importPackText(await file.text());
 }
 
 async function completedSet() {
@@ -312,6 +342,8 @@ const MMT_CARDS = [
     neu: 'For a floating, own-currency issuer like Australia the central bank sets the rate structure. Sovereign yields reflect policy stance, not credit risk — the "vigilantes" ride on terms the RBA writes.' },
   { n: '08', t: 'Unemployment is Natural', old: 'A pool of unemployment is the natural, necessary cost of keeping inflation low.',
     neu: 'Keeping people jobless is a policy choice that uses human lives as the price anchor. A buffer stock of EMPLOYED people — a Job Guarantee — anchors prices better and keeps communities like ours working.' },
+  { n: '09', t: '"How Do We Pay For It?"', old: 'Every proposal dies on the same question: where will the money come from?',
+    neu: 'The same place every dollar comes from: the currency issuer spends it into existence — exactly as money was "found" overnight for wars and bank rescues. The honest question is never the money; it\'s whether the workers, materials and energy exist. Audit the real resources, not the accounting.' },
 ];
 
 /* ================= dispatch (field -> HQ) ================= */
@@ -362,9 +394,51 @@ async function buildDispatch() {
             document.body.appendChild(link); link.click(); link.remove();
             for (const q of queue) { q.synced = true; await FDB.put('queue', q); }
             Tel.log('dispatch:sealed');
-            toast(`Sealed ${(json.length / 1024).toFixed(0)} KB → ${name}`, 'ok');
             renderView();
+            // alternate transport: when file shuffling is awkward in the field,
+            // the sealed packet is ciphertext — safe to paste through any channel
+            modal('DISPATCH SEALED', `
+              <p><b>${esc(name)}</b> downloaded (${(json.length / 1024).toFixed(0)} KB).</p>
+              <p class="dim">Drop the file into the sync folder — or copy the sealed packet and send it to HQ through any channel. It's AES-GCM ciphertext either way.</p>`,
+              [
+                { label: 'COPY SEALED JSON', cls: 'btn-amber', fn: async close => { await copyText(json); close(); } },
+                { label: 'DONE', fn: c => c() },
+              ]);
           } catch (e) { toast('Encryption failed: ' + e.message, 'error'); }
+        }
+      },
+    ]);
+}
+
+/* ================= field simulation (dev) =================
+   Injects a synthetic rapid-completion burst so HQ's Airlock auditor can be
+   demonstrated end-to-end: the burst trips BATCH (sub-second gaps), DENSITY
+   (tasks vs a seconds-long shift) and UNKNOWN_MISSION (synthetic ids). */
+
+function fieldSim() {
+  modal('⚙ FIELD SIMULATION', `
+    <p>Inject <b>3 synthetic completions</b> logged milliseconds apart, exactly like a shirker back-filling at the pub.</p>
+    <p class="dim">They queue as real work — dispatch them and HQ's auditor should raise BATCH, DENSITY and UNKNOWN_MISSION flags. Training tool, not a cheat: the flags fire BECAUSE it's fake.</p>`,
+    [
+      { label: 'CANCEL', fn: c => c() },
+      {
+        label: 'INJECT BURST', cls: 'btn-amber', fn: async close => {
+          close();
+          if (!currentShift()) {
+            const shift = { k: id('shf'), start: Date.now(), end: null, geo: null, synced: false };
+            localStorage.setItem('fl-shift', JSON.stringify(shift));
+            await FDB.put('shifts', shift);
+            renderShift();
+          }
+          const t0 = Date.now();
+          for (let i = 0; i < 3; i++) {
+            const mid = 'msn-sim-' + t0 + '-' + i;
+            await FDB.put('missions', { k: mid, id: mid, text: `Field simulation task ${i + 1}`, priority: 'low', constraints: { type: 'trust' }, sector: 'SIMULATION', receivedAt: t0 });
+            await FDB.put('queue', { k: id('cmp'), missionId: mid, text: `Field simulation task ${i + 1}`, constraintType: 'trust', ts: t0 + i * 250, evidence: { note: 'field simulation auto-fill', img: null }, synced: false });
+          }
+          Tel.log('fieldsim:burst');
+          toast('Burst injected — dispatch it and watch the Airlock flag it', 'warn');
+          renderView();
         }
       },
     ]);
@@ -414,8 +488,11 @@ async function renderView() {
     host.innerHTML = `
       <div class="card">
         <h3>Receive briefing</h3>
-        <p class="dim">Load a mission pack JSON from the shared sync folder.</p>
+        <p class="dim">Load a mission pack JSON from the shared sync folder…</p>
         <input type="file" id="pack-in" accept=".json" class="inp">
+        <p class="dim">…or paste it straight from a message:</p>
+        <textarea id="pack-paste" class="inp" rows="3" placeholder='{"kind":"civitas-missionpack", ...}'></textarea>
+        <button class="btn btn-block" id="pack-paste-btn">LOAD PASTED BRIEFING</button>
       </div>
       ${missions.map(m => `
         <div class="card msn-card ${done.has(m.id) ? 'done' : ''}">
@@ -433,6 +510,11 @@ async function renderView() {
       if (e.target.files[0]) importPackFile(e.target.files[0]);
       e.target.value = '';
     });
+    host.querySelector('#pack-paste-btn').addEventListener('click', () => {
+      const t = host.querySelector('#pack-paste').value.trim();
+      if (!t) { toast('Paste a mission pack first', 'warn'); return; }
+      importPackText(t);
+    });
     host.querySelectorAll('[data-do]').forEach(b => b.addEventListener('click', async () => {
       const m = (await FDB.all('missions')).find(x => x.k === b.dataset.do);
       if (m) completeMission(m);
@@ -442,16 +524,23 @@ async function renderView() {
     host.innerHTML = `
       <div class="card"><h3>Pocket MMT</h3>
       <p class="dim">Digital rebuttals matching the printed campaign cards. Old Way is what they'll say at the door — New Way is your answer.</p></div>
-      ${MMT_CARDS.map(c => `
+      ${MMT_CARDS.map((c, i) => `
         <div class="acc">
           <button class="acc-head"><span><span class="num">${c.n}</span>${esc(c.t)}</span><span>▾</span></button>
           <div class="acc-body">
             <div class="oldway"><b>OLD WAY:</b> ${esc(c.old)}</div>
             <div class="newway"><b>NEW WAY:</b> ${esc(c.neu)}</div>
+            <button class="btn" data-copyarg="${i}">⧉ COPY REBUTTAL</button>
           </div>
         </div>`).join('')}`;
     host.querySelectorAll('.acc-head').forEach(h =>
       h.addEventListener('click', () => h.parentElement.classList.toggle('acc-open')));
+    host.querySelectorAll('[data-copyarg]').forEach(b => b.addEventListener('click', async () => {
+      const c = MMT_CARDS[+b.dataset.copyarg];
+      await copyText(c.neu);
+      Tel.log('mmt:copy:' + c.n);
+      b.textContent = '✓ COPIED'; setTimeout(() => b.textContent = '⧉ COPY REBUTTAL', 1800);
+    }));
 
   } else if (view === 'dispatch') {
     const queue = await FDB.all('queue');
@@ -490,7 +579,9 @@ async function renderView() {
         3. Dispatch from a connected location; the queue holds offline forever.<br>
         4. If the device is at risk: burn first, explain later.</p>
       </div>
+      <button class="btn btn-block" id="fieldsim-btn" style="margin-bottom:10px">⚙ FIELD SIMULATION (DEV)</button>
       <button class="btn-burn" id="burn-btn">🔥 BURN PROTOCOL</button>`;
+    host.querySelector('#fieldsim-btn').addEventListener('click', fieldSim);
     host.querySelector('#burn-btn').addEventListener('click', burnFlow);
   }
 }

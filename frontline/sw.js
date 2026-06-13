@@ -2,7 +2,7 @@
 /* FRONTLINE service worker — offline-first app-shell caching.
    Cache-first so the terminal works flawlessly in regional black spots. */
 
-const VERSION = 'civitas-frontline-v1';
+const VERSION = 'civitas-frontline-v2';
 const ASSETS = [
   './',
   './index.html',

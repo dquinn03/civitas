@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "kind": "civitas-dispatch",
+  "dispatchId": "dsp-sample-demo-01",
+  "agentId": "agt-sample-lachlan",
+  "handle": "lachlan-01",
+  "created": 1781308800000,
+  "shift": {
+    "start": 1781305200000,
+    "end": 1781307000000,
+    "geo": { "lat": -33.835, "lon": 148.689, "acc": 12 }
+  },
+  "completions": [
+    {
+      "missionId": "msn-sample-trust-01",
+      "text": "Walk Kendal Street and note which shopfronts are newly vacant",
+      "constraintType": "trust",
+      "ts": 1781305900000,
+      "evidence": { "img": null, "note": "Three new vacancies between the chemist and the bakery." }
+    },
+    {
+      "missionId": "msn-sample-evid-02",
+      "text": "Distribute Card 04: Basic Income along Brisbane Street — photograph the last letterbox",
+      "constraintType": "evidence",
+      "ts": 1781305902500,
+      "evidence": {
+        "img": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        "note": "Forty cards out, last letterbox photographed."
+      }
+    }
+  ],
+  "telemetry": {
+    "count": 64,
+    "first": 1781305210000,
+    "last": 1781306990000,
+    "events": [
+      { "t": 1781305210000, "a": "shift:start" },
+      { "t": 1781305900000, "a": "mission:done" },
+      { "t": 1781305902500, "a": "mission:done" },
+      { "t": 1781306990000, "a": "shift:end" }
+    ]
+  },
+  "_README": "Deliberately UNENCRYPTED demo dispatch. Rename to dispatch-demo.json, drop it in your dropzone folder and SCAN: the Airlock will raise UNENCRYPTED and BATCH flags (the two completions are 2.5s apart). Real dispatches from Frontline arrive AES-GCM sealed."
+}

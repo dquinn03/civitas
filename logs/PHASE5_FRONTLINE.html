@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 5 — Frontline PWA (ELI5 decision log)</title>
+<style>
+ body{max-width:860px;margin:2rem auto;padding:0 1.2rem 4rem;background:#0d0f14;color:#d8dbe2;
+      font:15px/1.65 'Segoe UI',system-ui,sans-serif}
+ h1,h2,h3,h4{font-family:Consolas,'Courier New',monospace;color:#e8b84b;letter-spacing:.5px;line-height:1.3}
+ h1{border-bottom:1px solid #262b3b;padding-bottom:.35em}
+ a{color:#7aa6d8} a:hover{color:#e8b84b}
+ code{background:#151823;border:1px solid #262b3b;border-radius:4px;padding:.1em .4em;
+      font-family:Consolas,monospace;font-size:.9em}
+ pre{background:#10131b;border:1px solid #262b3b;border-radius:8px;padding:14px;overflow-x:auto}
+ pre code{background:none;border:none;padding:0}
+ blockquote{border-left:3px solid #b88d2c;margin-left:0;padding-left:14px;color:#8d96a8}
+ table{border-collapse:collapse;margin:1em 0;width:100%}
+ th,td{border:1px solid #262b3b;padding:7px 11px;text-align:left}
+ th{background:#151823;color:#e8b84b;font-family:Consolas,monospace;font-size:.85em;letter-spacing:1px}
+ tr:nth-child(even){background:#11141d}
+ hr{border:none;border-top:1px solid #262b3b;margin:2.2rem 0}
+ .src{font-size:.75em;color:#566074;border-top:1px solid #262b3b;margin-top:3rem;padding-top:.8rem;
+      font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+<h1>Phase 5 — Frontline PWA (ELI5 decision log)</h1>
+<p><em>Build date: 13 June 2026</em></p>
+<h2>What got built</h2>
+<p>The field terminal: an installable phone app that works with zero internet, takes evidence photos, squashes them, queues everything in IndexedDB, seals dispatches with real encryption, and can burn itself.</p>
+<h2>Decisions, explained like you're five</h2>
+<p><strong>1. Why does Frontline use NO external libraries at all?</strong> The Commander sits in an office with internet. The agent stands in a paddock outside Cowra with zero bars. Every CDN library is a promise that the internet will be there — Frontline refuses to make that promise. Plain CSS, plain JS, service worker caches the lot on first visit, and from then on the app opens forever, offline, instantly.</p>
+<p><strong>2. How does the photo squashing work?</strong> Phone cameras make 5MB photos; a dispatch must stay under 2MB with several photos inside. So: draw the photo onto an invisible canvas no wider than 1280px (that alone kills most of the weight), then save as JPEG at 80% quality, and if it's still too big, step the quality down (70%, 60%… floor 35%) until it fits ~400KB encoded. Bonus: re-drawing through a canvas strips the EXIF block — GPS and serial numbers in the photo file don't ride along by accident. (The <em>shift</em> geotag is separate and consensual.)</p>
+<p><strong>3. How does the encryption actually protect anyone?</strong> The dispatch file sits in a Dropbox/SyncThing folder that other people might see. Web Crypto turns the passphrase into a key by folding it 250,000 times (PBKDF2 — slow on purpose, so guessing is expensive), then AES-GCM seals the payload. GCM also <em>authenticates</em>: if anyone flips a single bit in transit, decryption fails loudly instead of producing subtly-wrong data. Names, locations, photos — unreadable without the HQ passphrase.</p>
+<p><strong>4. What is the black box telemetry, honestly?</strong> A list of timestamps: "tap at 14:02:11, tap at 14:02:43…". It does NOT record what was typed, where you were (beyond the shift geotag), or anything content-like. Its only job is to let the auditor answer one question: <em>was a human present and working across the shift, or did everything get punched in during 90 seconds at the pub?</em> That's the Principal-Agent fix: standardised proof of work that's cheap for honest agents and expensive for fakers.</p>
+<p><strong>5. Why is the Burn Protocol so prominent?</strong> Field reality: phones get lost, borrowed, taken. The agent must be able to clear the device in less time than it takes someone to say "hand it over". Type BURN, tap once: IndexedDB deleted, localStorage cleared, caches purged, screen says TERMINAL CLEAN. It's deliberately dramatic — a safety control you have to <em>find</em> is not a safety control.</p>
+<p><strong>6. Why must the shift start before missions can complete?</strong> Because unbounded claims are unauditable claims. The shift clock is what the density check divides by. No shift = the auditor literally cannot tell "3 tasks in 6 hours" from "3 tasks in 3 seconds" — so the app refuses to log work outside one, and HQ flags any dispatch that tries (<code>NO_SHIFT</code>).</p>
+<p><strong>7. Why does the queue survive forever offline?</strong> IndexedDB is the phone's own filing cabinet — surviving reboots, airplane mode, weeks in a drawer. Completions queue locally and only leave the device inside a sealed dispatch the agent explicitly exports. Store-and-forward, like packet radio: black spots delay the mail, they never lose it.</p>
+<p class="src">CIVITAS · generated from PHASE5_FRONTLINE.md by tools/md2html.py — edit the .md, not this file.</p>
+</body>
+</html>

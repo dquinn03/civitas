@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0f14">
+  <title>FRONTLINE</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <!-- ZERO external dependencies: Frontline must work in black spots with no internet, ever. -->
+  <link rel="stylesheet" href="css/frontline.css">
+</head>
+<body>
+
+  <header class="top">
+    <div class="brand">▰ FRONTLINE</div>
+    <div class="agent-id" id="hdr-agent">—</div>
+    <div id="net-dot" class="net-dot" title="connectivity"></div>
+  </header>
+
+  <!-- SHIFT PROTOCOL -->
+  <div class="shift-bar" id="shift-bar">
+    <div>
+      <div class="shift-label" id="shift-label">OFF SHIFT</div>
+      <div class="shift-time" id="shift-time"></div>
+    </div>
+    <button class="btn btn-big" id="shift-btn">START SHIFT</button>
+  </div>
+
+  <main id="view"></main>
+
+  <nav class="bottom-nav">
+    <button data-view="missions" class="nav-btn nav-active">⛭<span>MISSIONS</span></button>
+    <button data-view="mmt" class="nav-btn">⇄<span>POCKET MMT</span></button>
+    <button data-view="dispatch" class="nav-btn">⇪<span>DISPATCH</span></button>
+    <button data-view="sys" class="nav-btn">⚠<span>SYSTEM</span></button>
+  </nav>
+
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
+
+  <script src="js/crypto.js"></script>
+  <script src="js/frontline.js"></script>
+</body>
+</html>

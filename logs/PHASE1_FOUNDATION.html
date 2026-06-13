@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 1 — Foundation (ELI5 decision log)</title>
+<style>
+ body{max-width:860px;margin:2rem auto;padding:0 1.2rem 4rem;background:#0d0f14;color:#d8dbe2;
+      font:15px/1.65 'Segoe UI',system-ui,sans-serif}
+ h1,h2,h3,h4{font-family:Consolas,'Courier New',monospace;color:#e8b84b;letter-spacing:.5px;line-height:1.3}
+ h1{border-bottom:1px solid #262b3b;padding-bottom:.35em}
+ a{color:#7aa6d8} a:hover{color:#e8b84b}
+ code{background:#151823;border:1px solid #262b3b;border-radius:4px;padding:.1em .4em;
+      font-family:Consolas,monospace;font-size:.9em}
+ pre{background:#10131b;border:1px solid #262b3b;border-radius:8px;padding:14px;overflow-x:auto}
+ pre code{background:none;border:none;padding:0}
+ blockquote{border-left:3px solid #b88d2c;margin-left:0;padding-left:14px;color:#8d96a8}
+ table{border-collapse:collapse;margin:1em 0;width:100%}
+ th,td{border:1px solid #262b3b;padding:7px 11px;text-align:left}
+ th{background:#151823;color:#e8b84b;font-family:Consolas,monospace;font-size:.85em;letter-spacing:1px}
+ tr:nth-child(even){background:#11141d}
+ hr{border:none;border-top:1px solid #262b3b;margin:2.2rem 0}
+ .src{font-size:.75em;color:#566074;border-top:1px solid #262b3b;margin-top:3rem;padding-top:.8rem;
+      font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+<h1>Phase 1 — Foundation (ELI5 decision log)</h1>
+<p><em>Build date: 13 June 2026</em></p>
+<h2>What got built</h2>
+<p>The skeleton: one big JSON "toy box" that holds everything, the machinery to save it to a real file on the hard drive, automatic backup copies, and the dark terminal layout with four tabs.</p>
+<h2>Decisions, explained like you're five</h2>
+<p><strong>1. Why is everything in ONE json file?</strong> Imagine all your toys in one box. If you want to move house, you carry one box. If you want a copy, you photocopy one box. If someone wants to spy on your toys, they have to come to YOUR house — there is no toy warehouse in the cloud to raid. That's data sovereignty.</p>
+<p><strong>2. Why do you need to click "Reconnect" after restarting the browser?</strong> The browser is like a careful babysitter. Even if you said "Civitas can touch my file" yesterday, the babysitter asks again today: "still okay?" Browsers literally do not allow a website to silently regain file access after a restart — one click per session is the minimum the platform permits. So the button exists and the status pill turns yellow to remind you.</p>
+<p><strong>3. Why a .bat launcher instead of double-clicking index.html?</strong> The special file-access powers only work when the page is served like a real website. <code>localhost</code> (your own computer talking to itself) counts as "real". Double-clicked files sometimes don't. The .bat file uses Python's built-in server — Python comes with the machine and is NOT a build pipeline; nothing gets compiled, it just hands files over.</p>
+<p><strong>4. Why keep a copy in localStorage too?</strong> Belt AND braces. If you open the terminal before connecting the vault file, you still see your stuff (from the browser's pocket). But the pocket is small — photos can overflow it — so the file on disk is always the real truth and the pocket is just a comfort blanket. The save-dot turns RED when only the pocket copy worked, so you can't be fooled.</p>
+<p><strong>5. Why daily backup files instead of one backup?</strong> If today's file gets corrupted and you only had one backup, the corruption might already be IN the backup. Date-stamped files (<code>civitas-backup-2026-06-13.json</code>) mean you can step back in time day by day. Snapshots add a "save before I do something scary" button.</p>
+<p><strong>6. Why never trim the activity feed?</strong> It's the campaign's flight recorder. The dashboards, the audits, and the reliability scores are all calculated FROM it. Deleting old entries to "save space" would be eating the evidence. JSON text is tiny; disk space is not the scarce resource here — trust is.</p>
+<h2>What I deliberately did NOT do</h2>
+<ul>
+<li>No auto-connect to a default file path (browsers forbid it — and it would hide where your data lives).</li>
+<li>No cloud anything.</li>
+</ul>
+<p class="src">CIVITAS · generated from PHASE1_FOUNDATION.md by tools/md2html.py — edit the .md, not this file.</p>
+</body>
+</html>

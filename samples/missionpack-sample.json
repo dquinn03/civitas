@@ -1,0 +1,39 @@
+{
+  "v": 1,
+  "kind": "civitas-missionpack",
+  "packId": "pack-sample-0001",
+  "created": 1765584000000,
+  "hq": "HQ",
+  "missions": [
+    {
+      "id": "msn-sample-trust-01",
+      "text": "Walk Kendal Street and note which shopfronts are newly vacant",
+      "priority": "medium",
+      "constraints": { "type": "trust" },
+      "sector": "COWRA-CBD",
+      "due": null,
+      "isStandingOrder": false
+    },
+    {
+      "id": "msn-sample-evid-02",
+      "text": "Distribute Card 04: Basic Income along Brisbane Street — photograph the last letterbox",
+      "priority": "high",
+      "constraints": { "type": "evidence" },
+      "sector": "COWRA-WEST",
+      "due": null,
+      "isStandingOrder": false
+    },
+    {
+      "id": "msn-sample-chal-03",
+      "text": "Attend the community meeting and collect the verification code from the organiser",
+      "priority": "medium",
+      "constraints": {
+        "type": "challenge",
+        "challengeHash": "6b6dc8b3f6925fd029bd902a44f4aea098e10153d573c47c4ac866665b6ce5d7"
+      },
+      "sector": "COWRA-CBD",
+      "due": null,
+      "isStandingOrder": false
+    }
+  ]
+}

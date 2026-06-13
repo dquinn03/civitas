@@ -1,0 +1,73 @@
+{
+  "meta": { "app": "civitas", "schema": 1, "created": 1781308800000, "updated": 1781308800000, "hqHandle": "HQ" },
+  "volunteers": [
+    {
+      "id": "agt-sample-lachlan", "email": "lachlan@example.org", "handle": "lachlan-01",
+      "location": "Cowra", "role": "field", "xp": 120,
+      "skills": ["letterboxing", "doorknocking"], "notes": "Reliable weekend operator.",
+      "joined": 1778630400000, "reliabilityScore": 84
+    },
+    {
+      "id": "agt-sample-wyangala", "email": "w@example.org", "handle": "wyangala",
+      "location": "Wyangala", "role": "researcher", "xp": 45,
+      "skills": ["data entry", "writing"], "notes": "Remote — works the Exocortex backlog.",
+      "joined": 1779840000000, "reliabilityScore": 71
+    }
+  ],
+  "missions": [
+    {
+      "id": "msn-sample-standing-01", "text": "Morning scan: local paper + council agenda for housing items",
+      "priority": "medium", "constraints": { "type": "trust" }, "sector": "RESEARCH",
+      "due": null, "completed": false, "completedAt": null, "completedBy": "HQ", "evidence": null,
+      "isStandingOrder": true, "lastCompletedDate": "2026-06-12", "streak": 4, "timestamp": 1780617600000, "broadcastAt": null
+    },
+    {
+      "id": "msn-sample-active-01", "text": "Draft the buffer stock explainer for the next Substack post",
+      "priority": "high", "constraints": { "type": "trust" }, "sector": "RESEARCH",
+      "due": "2026-06-19", "completed": false, "completedAt": null, "completedBy": null, "evidence": null,
+      "isStandingOrder": false, "lastCompletedDate": null, "streak": 0, "timestamp": 1781222400000, "broadcastAt": null
+    },
+    {
+      "id": "msn-sample-done-01", "text": "Print run: 200 copies of Card 04 (Basic Income)",
+      "priority": "medium", "constraints": { "type": "evidence" }, "sector": "COWRA-CBD",
+      "due": null, "completed": true, "completedAt": 1781136000000, "completedBy": "HQ",
+      "evidence": { "note": "Collected from the printer, boxed in the office.", "img": null },
+      "isStandingOrder": false, "lastCompletedDate": null, "streak": 0, "timestamp": 1781049600000, "broadcastAt": null
+    }
+  ],
+  "notes": [
+    {
+      "id": "note-sample-01", "title": "Buffer Stock Theory",
+      "content": "# Buffer Stock Theory\n\nThe core move: stabilise a price by holding a **buffer stock** of the thing itself.\n\n- Wool floor price scheme: buffer stock of wool\n- [[Job Guarantee]]: buffer stock of *employed people*\n- Unemployment (NAIRU): buffer stock of *unemployed people* — the cruel anchor\n\n> The question is never *whether* we run a buffer stock. It is *which one*, and *who pays the carrying cost*.\n\nSee [[Monetary Sovereignty]] for why the issuer can always finance the superior buffer.",
+      "tags": ["theory", "manuscript"], "createdAt": 1780012800000, "updatedAt": 1781222400000
+    },
+    {
+      "id": "note-sample-02", "title": "Job Guarantee",
+      "content": "# Job Guarantee\n\nA standing public option for work at a fixed wage. Anchors the price level from below while delivering public value.\n\nLinks back to [[Buffer Stock Theory]] — the JG *is* the employed buffer stock.\n\nCampaign asset: **Card 04** pairs this with basic income framing for the doorstep.",
+      "tags": ["theory", "campaign"], "createdAt": 1780099200000, "updatedAt": 1780704000000
+    },
+    {
+      "id": "note-sample-03", "title": "Monetary Sovereignty",
+      "content": "# Monetary Sovereignty\n\nAustralia is a **Source Anchor**: free-floating key currency, own-currency debt, full central-bank capacity.\n\nImplication for the doorstep: *sovereign yields reflect policy stance, not credit risk*. The household-budget analogy is a category error — see [[Buffer Stock Theory]].",
+      "tags": ["theory", "manuscript"], "createdAt": 1780185600000, "updatedAt": 1780790400000
+    },
+    {
+      "id": "note-sample-04", "title": "Cowra Campaign Log",
+      "content": "# Cowra Campaign Log\n\n## Week of 8 June 2026\n\n- Card 04 print run complete (200 copies)\n- Kendal St vacancy walk scheduled\n- New volunteer onboarded from Wyangala — remote research role\n\nNext: letterbox COWRA-WEST, then compile the #manuscript notes for Substack.",
+      "tags": ["campaign"], "createdAt": 1780963200000, "updatedAt": 1781308800000
+    }
+  ],
+  "activityFeed": [
+    { "id": "act-s1", "agentId": "HQ", "actionType": "MISSION_CREATED", "detail": "Print run: 200 copies of Card 04", "timestamp": 1781049600000 },
+    { "id": "act-s2", "agentId": "HQ", "actionType": "MISSION_COMPLETE", "detail": "Print run: 200 copies of Card 04", "timestamp": 1781136000000 },
+    { "id": "act-s3", "agentId": "HQ", "actionType": "FOCUS_SESSION", "detail": "47m", "timestamp": 1781140000000 },
+    { "id": "act-s4", "agentId": "agt-sample-lachlan", "actionType": "MISSION_COMPLETE", "detail": "Letterbox run COWRA-WEST", "timestamp": 1781210000000 }
+  ],
+  "campaignStats": [
+    { "date": "2026-06-11", "totalActions": 2, "totalFocusSeconds": 2820 },
+    { "date": "2026-06-12", "totalActions": 2, "totalFocusSeconds": 1500 }
+  ],
+  "evidenceHashes": {},
+  "processedDispatchIds": [],
+  "settings": { "backupEveryMin": 30, "densityMaxPerHour": 12, "batchWindowMs": 5000 }
+}

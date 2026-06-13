@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CIVITAS // COMMAND TERMINAL</title>
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+
+  <!-- External libraries: CDN ONLY. No build pipeline, ever. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@15.0.4/build/Tone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- ?v= busts the browser HTTP cache on upgrades (python http.server sends no cache headers) — bump on every release -->
+  <link rel="stylesheet" href="css/civitas.css?v=1.0.0">
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <i class="fa-solid fa-chess-rook"></i> CIVITAS
+      <span class="brand-sub">COMMAND TERMINAL · COWRA HQ</span>
+    </div>
+
+    <div class="topbar-right">
+      <span id="vault-pill" class="pill pill-warn">VAULT: …</span>
+      <span id="backup-pill" class="pill pill-warn">BACKUP: …</span>
+      <span id="save-dot" class="save-dot" title=""></span>
+
+      <div id="noise-controls" class="noise-controls" title="Sensory environment — protect cognitive bandwidth">
+        <button class="btn btn-ghost btn-sm" data-noise="brown" title="Brown noise">BRN</button>
+        <button class="btn btn-ghost btn-sm" data-noise="pink" title="Pink noise">PNK</button>
+        <button class="btn btn-ghost btn-sm" data-noise="rain" title="Rain">RAIN</button>
+        <input id="noise-volume" type="range" min="0" max="100" value="50" title="Volume">
+      </div>
+
+      <div class="vault-wrap">
+        <button id="vault-menu-btn" class="btn btn-amber btn-sm"><i class="fa-solid fa-vault"></i> VAULT</button>
+        <div id="vault-menu" class="vault-menu hidden">
+          <button id="vault-new" class="vm-item"><i class="fa-solid fa-file-circle-plus"></i> New Vault file…</button>
+          <button id="vault-open" class="vm-item"><i class="fa-solid fa-folder-open"></i> Open Vault file…</button>
+          <button id="vault-reconnect" class="vm-item"><i class="fa-solid fa-plug-circle-bolt"></i> Reconnect (after restart)</button>
+          <hr>
+          <button id="vault-backupdir" class="vm-item"><i class="fa-solid fa-box-archive"></i> Choose backup folder…</button>
+          <button id="vault-snapshot" class="vm-item"><i class="fa-solid fa-camera-retro"></i> Snapshot now</button>
+          <hr>
+          <button id="vault-export" class="vm-item"><i class="fa-solid fa-download"></i> Export JSON (any browser)</button>
+          <label class="vm-item" for="vault-import" style="cursor:pointer"><i class="fa-solid fa-upload"></i> Import JSON…</label>
+          <input type="file" id="vault-import" accept=".json" class="hidden">
+        </div>
+      </div>
+
+      <button id="help-btn" class="btn btn-ghost btn-sm" title="Rerun spotlight tour"><i class="fa-solid fa-circle-question"></i></button>
+    </div>
+  </header>
+
+  <!-- ============ NAV ============ -->
+  <nav class="tabs">
+    <button class="tab-btn tab-active" data-tab="exocortex"><i class="fa-solid fa-brain"></i> EXOCORTEX</button>
+    <button class="tab-btn" data-tab="ops"><i class="fa-solid fa-bullseye"></i> OPS</button>
+    <button class="tab-btn" data-tab="network"><i class="fa-solid fa-circle-nodes"></i> NETWORK</button>
+    <button class="tab-btn" data-tab="airlock"><i class="fa-solid fa-door-closed"></i> AIRLOCK</button>
+  </nav>
+
+  <main>
+
+    <!-- ============ MODULE A: EXOCORTEX ============ -->
+    <section id="tab-exocortex" class="tab-pane exo-grid">
+      <div class="panel exo-side">
+        <div class="panel-head">
+          <input id="exo-search" class="inp inp-sm" placeholder="Search notes & #tags…">
+          <button id="exo-new" class="btn btn-amber btn-sm" title="New note"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <div id="exo-list" class="scroll"></div>
+      </div>
+
+      <div class="panel exo-main">
+        <div class="panel-head">
+          <input id="exo-title" class="inp inp-title" placeholder="Note title…">
+          <input id="exo-tags" class="inp inp-sm" placeholder="tags, comma, separated" style="max-width:220px">
+          <button id="exo-toggle" class="btn btn-ghost btn-sm">PREVIEW</button>
+          <button id="exo-compile" class="btn btn-ghost btn-sm" title="Manuscript compiler"><i class="fa-solid fa-book"></i> COMPILE</button>
+          <button id="exo-delete" class="btn btn-ghost btn-sm" title="Delete note"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <textarea id="exo-content" class="exo-editor scroll" placeholder="# Write in markdown…&#10;&#10;Link concepts with [[Wiki Links]]. Tag for the compiler. Think in public later — think here first."></textarea>
+        <div id="exo-preview" class="exo-preview scroll hidden"></div>
+      </div>
+
+      <div class="panel exo-ctx">
+        <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-sitemap"></i> CONTEXT</span></div>
+        <div id="exo-context" class="scroll pad"></div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE B: OPS ============ -->
+    <section id="tab-ops" class="tab-pane ops-grid hidden">
+      <div class="ops-left">
+        <div class="panel" id="ops-composer">
+          <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-plus"></i> NEW MISSION</span></div>
+          <div class="pad">
+            <input id="ops-text" class="inp" placeholder='e.g. "Letterbox Card 04 along Brisbane St next Friday"'>
+            <div class="composer-row">
+              <select id="ops-priority" class="inp inp-sm">
+                <option value="high">HIGH</option>
+                <option value="medium" selected>MEDIUM</option>
+                <option value="low">LOW</option>
+              </select>
+              <select id="ops-constraint" class="inp inp-sm" title="How completion is proven">
+                <option value="trust">TRUST</option>
+                <option value="evidence">EVIDENCE</option>
+                <option value="challenge">CHALLENGE</option>
+              </select>
+              <input id="ops-sector" class="inp inp-sm" placeholder="SECTOR (e.g. COWRA-WEST)">
+              <label class="lbl-inline"><input type="checkbox" id="ops-standing"> STANDING ORDER</label>
+              <button id="ops-add" class="btn btn-amber btn-sm">DEPLOY</button>
+            </div>
+            <div id="ops-challenge-wrap" class="hidden">
+              <input id="ops-challenge" class="inp inp-sm" placeholder="Challenge pass-answer (stored as SHA-256 only)">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-fire"></i> STANDING ORDERS <span class="dim">(reset at midnight)</span></span></div>
+          <div id="ops-standing-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title"><i class="fa-solid fa-list-check"></i> ACTIVE MISSIONS</span>
+            <button id="ops-broadcast" class="btn btn-amber btn-sm" title="Write selected missions as a pack to the dropzone"><i class="fa-solid fa-tower-broadcast"></i> BROADCAST PACK</button>
+          </div>
+          <div id="ops-active-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-check-double"></i> COMPLETED <span class="dim">(<span id="ops-done-count">0</span>)</span></span></div>
+          <div id="ops-done-list"></div>
+        </div>
+      </div>
+
+      <div class="ops-right" id="ops-dash">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-stopwatch"></i> FOCUS</span></div>
+          <div class="pad focus-card">
+            <div id="focus-display" class="focus-display">00:00</div>
+            <div class="focus-row">
+              <button id="focus-toggle" class="btn btn-amber btn-sm">START</button>
+              <button id="focus-bank" class="btn btn-ghost btn-sm" title="Bank this session into campaign stats">BANK</button>
+            </div>
+            <div class="dim">Today: <span id="focus-today">0s</span></div>
+          </div>
+        </div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">ACTIVITY — 14 DAYS</span></div><div class="pad"><canvas id="chart-activity" height="150"></canvas></div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">FOCUS TIME — 14 DAYS</span></div><div class="pad"><canvas id="chart-focus" height="150"></canvas></div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-title">TIME PATTERNS — BY HOUR</span></div><div class="pad"><canvas id="chart-pattern" height="150"></canvas></div></div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE C: NETWORK ============ -->
+    <section id="tab-network" class="tab-pane hidden">
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-circle-nodes"></i> NETWORK TOPOLOGY</span>
+          <span class="dim">agents → HQ → completed sectors · click a node</span></div>
+        <div class="pad"><canvas id="net-topo"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title"><i class="fa-solid fa-users"></i> ROSTER <span class="dim">(<span id="net-count">0</span>)</span></span>
+          <input id="net-search" class="inp inp-sm" placeholder="Filter agents…" style="max-width:240px">
+          <span>
+            <button id="net-import" class="btn btn-ghost btn-sm"><i class="fa-solid fa-file-csv"></i> CSV IMPORT</button>
+            <button id="net-add" class="btn btn-amber btn-sm"><i class="fa-solid fa-user-plus"></i> RECRUIT</button>
+          </span>
+        </div>
+        <div id="net-roster" class="roster-grid pad"></div>
+      </div>
+      <div id="net-tooltip" class="net-tooltip hidden"></div>
+    </section>
+
+    <!-- ============ AIRLOCK ============ -->
+    <section id="tab-airlock" class="tab-pane hidden">
+      <div class="panel" id="air-panel">
+        <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-door-closed"></i> THE AIRLOCK <span class="dim">— escrow for field dispatches</span></span></div>
+        <div class="pad airlock-controls">
+          <span id="dropzone-pill" class="pill pill-warn">DROPZONE: NOT SET</span>
+          <button id="air-connect" class="btn btn-ghost btn-sm"><i class="fa-solid fa-folder-tree"></i> CONNECT DROPZONE</button>
+          <input id="air-pass" type="password" class="inp inp-sm" placeholder="HQ passphrase (session only)" style="max-width:240px" autocomplete="off">
+          <button id="air-scan" class="btn btn-amber btn-sm"><i class="fa-solid fa-radar"></i> SCAN DROPZONE</button>
+          <label class="btn btn-ghost btn-sm" for="air-manual" style="cursor:pointer"><i class="fa-solid fa-file-import"></i> MANUAL INGEST</label>
+          <input type="file" id="air-manual" accept=".json" multiple class="hidden">
+        </div>
+        <p class="dim pad-x">Dispatches decrypt into escrow below — automated audits flag batch back-fill, duplicate evidence photos and impossible task density. Nothing touches the master state until you approve it.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title"><i class="fa-solid fa-boxes-stacked"></i> STAGED DISPATCHES <span class="dim">(<span id="air-count">0</span>)</span></span></div>
+        <div id="air-staged"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
+  <div id="spotlight-root"></div>
+
+  <!-- Modular frontend: distinct script tags, no bundler -->
+  <script src="js/util.js?v=1.0.0"></script>
+  <script src="js/crypto.js?v=1.0.0"></script>
+  <script src="js/data.js?v=1.0.0"></script>
+  <script src="js/audio.js?v=1.0.0"></script>
+  <script src="js/exocortex.js?v=1.0.0"></script>
+  <script src="js/ops.js?v=1.0.0"></script>
+  <script src="js/network.js?v=1.0.0"></script>
+  <script src="js/airlock.js?v=1.0.0"></script>
+  <script src="js/onboarding.js?v=1.0.0"></script>
+  <script src="js/app.js?v=1.0.0"></script>
+</body>
+</html>

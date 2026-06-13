@@ -1,0 +1,11 @@
+# Data, not code — vault files and their backups never enter version control
+/civitas-master.json
+/civitas-backup-*.json
+/civitas-snapshot-*.json
+/civitas-export-*.json
+/dispatch-*.json
+/missionpack-*.json
+
+# OS noise
+Thumbs.db
+.DS_Store

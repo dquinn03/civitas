@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Blueprint: Civitas</title>
+<style>
+ body{max-width:860px;margin:2rem auto;padding:0 1.2rem 4rem;background:#0d0f14;color:#d8dbe2;
+      font:15px/1.65 'Segoe UI',system-ui,sans-serif}
+ h1,h2,h3,h4{font-family:Consolas,'Courier New',monospace;color:#e8b84b;letter-spacing:.5px;line-height:1.3}
+ h1{border-bottom:1px solid #262b3b;padding-bottom:.35em}
+ a{color:#7aa6d8} a:hover{color:#e8b84b}
+ code{background:#151823;border:1px solid #262b3b;border-radius:4px;padding:.1em .4em;
+      font-family:Consolas,monospace;font-size:.9em}
+ pre{background:#10131b;border:1px solid #262b3b;border-radius:8px;padding:14px;overflow-x:auto}
+ pre code{background:none;border:none;padding:0}
+ blockquote{border-left:3px solid #b88d2c;margin-left:0;padding-left:14px;color:#8d96a8}
+ table{border-collapse:collapse;margin:1em 0;width:100%}
+ th,td{border:1px solid #262b3b;padding:7px 11px;text-align:left}
+ th{background:#151823;color:#e8b84b;font-family:Consolas,monospace;font-size:.85em;letter-spacing:1px}
+ tr:nth-child(even){background:#11141d}
+ hr{border:none;border-top:1px solid #262b3b;margin:2.2rem 0}
+ .src{font-size:.75em;color:#566074;border-top:1px solid #262b3b;margin-top:3rem;padding-top:.8rem;
+      font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+<h1>Project Blueprint: Civitas</h1>
+<p><strong>Mission:</strong> A local-first, modular operating system for intellectual insurgency.</p>
+<p><strong>Core Context:</strong> Based in Cowra, Regional NSW. The system bridges deep heterodox economic research (MMT, Buffer Stock theory) and strategic political action.</p>
+<p><strong>Risk Model:</strong> Designed to solve the Principal-Agent problem. As the network scales to include remote volunteers or paid organisers, the system acts as an automated auditor to prevent shirking, standardise proof of work, and verify resource allocation.</p>
+<h2>1. Strict Architectural Constraints &amp; Tech Stack</h2>
+<ul>
+<li><strong>No Build Pipelines:</strong> Absolutely no Node.js, Webpack, React, or npm installations.</li>
+<li><strong>Vanilla Foundations:</strong> Raw HTML5, native JavaScript (ES6+), and CSS.</li>
+<li><strong>External Libraries (CDN only):</strong> Tailwind CSS, FontAwesome, Chart.js (analytics), Tone.js (sensory audio), Canvas Confetti (gamification).</li>
+<li><strong>Modular Frontend:</strong> <code>index.html</code> imports logic via distinct <code>&lt;script src="js/module.js"&gt;</code> tags (<code>util.js</code>, <code>crypto.js</code>, <code>data.js</code>, <code>audio.js</code>, <code>exocortex.js</code>, <code>ops.js</code>, <code>network.js</code>, <code>airlock.js</code>, <code>onboarding.js</code>, <code>app.js</code>).</li>
+<li><strong>Absolute Data Sovereignty:</strong> Core state managed via the native File System Access API, reading/writing one master <code>.json</code> file on the Commander's hard drive.</li>
+<li><strong>Automated Redundancy:</strong> Timestamped backup snapshots (<code>civitas-backup-YYYY-MM-DD.json</code>) write automatically to a local directory.</li>
+</ul>
+<h2>2. Core Data Schema (The Master State)</h2>
+<pre><code>volunteers:    [{ id, email, handle, location, role, xp, skills[], notes, joined, reliabilityScore }]
+missions:      [{ id, text, priority, constraints:{type, challengeHash?}, sector, due, completed,
+                  completedAt, completedBy, evidence, isStandingOrder, lastCompletedDate, streak,
+                  timestamp, broadcastAt }]
+notes:         [{ id, title, content (markdown), tags[], createdAt, updatedAt }]
+activityFeed:  [{ id, agentId, actionType, detail, timestamp }]
+campaignStats: [{ date, totalActions, totalFocusSeconds }]
+evidenceHashes:{ sha256 -&gt; {agentId, missionId, date} }      // auditor memory
+processedDispatchIds: []                                      // replay protection
+settings:      { backupEveryMin, densityMaxPerHour, batchWindowMs }
+</code></pre>
+<h2>3. Agent Synchronisation: The "Dropzone" &amp; "Airlock"</h2>
+<ul>
+<li><strong>The Sync Directory:</strong> Commander and Agents share an OS-level folder (SyncThing, Dropbox, USB).</li>
+<li><strong>Briefings (HQ → Field):</strong> HQ broadcasts Mission Packs as JSON to the Dropzone.</li>
+<li><strong>Execution &amp; Compression:</strong> Frontline uses the HTML5 Canvas API to forcefully downscale/compress photos (max 1280px, JPEG quality stepping 0.8 → 0.35) before Base64 conversion, so Dispatch JSON stays well under 2MB.</li>
+<li><strong>Encrypted Dispatches (Field → HQ):</strong> Payloads are encrypted with the native Web Crypto API — AES-GCM 256 with a PBKDF2-SHA256 passphrase-derived key (250k iterations, random salt + IV per dispatch) — protecting activist identities.</li>
+<li><strong>The Airlock:</strong> The Commander terminal scans the Dropzone. Dispatches enter an escrow staging area rather than writing directly to the database. Approve merges; Reject penalises.</li>
+</ul>
+<h2>4. Module Specifications (Commander Terminal)</h2>
+<h3>Module A: The Exocortex (Strategy &amp; Knowledge)</h3>
+<ul>
+<li>Robust regex Markdown engine: headings, bold, italic, lists, blockquotes, code, fenced blocks, links.</li>
+<li>Wiki-linking: <code>[[Concept]]</code> renders clickable; clicking a link to a missing note creates it.</li>
+<li>Context Panel (split-view sidebar): <strong>Backlinks</strong> (notes linking here) + <strong>Similar</strong> (keyword-frequency overlap, normalised) + tag cloud.</li>
+<li>Manuscript Compiler: filter by #tag → single chronological HTML document for Substack/blog, downloaded and opened.</li>
+<li>Sensory Environment: Tone.js infinite brown noise, pink noise, and rain filter.</li>
+</ul>
+<h3>Module B: Unified Command (Operations)</h3>
+<ul>
+<li>Mission Validation Constraints: <strong>Trust</strong> (binary), <strong>Evidence</strong> (photo/text receipt), <strong>Challenge</strong> (specific input, verified against a SHA-256 hash so the answer never travels in cleartext).</li>
+<li>Natural Language Parsing: regex date extraction — "next Friday", "tomorrow", "in 3 days", "12/7", ISO. Day-first (AU).</li>
+<li>Physical Campaign Integration: missions reference physical artifacts (e.g. "Distribute Card 04: Basic Income"); Pocket MMT on Frontline carries the digital twins.</li>
+<li>Standing Orders &amp; Streaks: daily routines reset autonomously at midnight (date-derived, so no timer can miss it); consecutive-day streaks.</li>
+<li>Campaign Health Dashboards: Chart.js — Activity (bar), Focus Time (line), Time Patterns by hour (bar). Focus timer banks deep-work seconds into <code>campaignStats</code>.</li>
+</ul>
+<h3>Module C: Agent Network (Decentralised CRM)</h3>
+<ul>
+<li>Automated Auditing Logic (runs in the Airlock on every dispatch):</li>
+<li><strong>Batch Flag</strong> — completions logged within impossibly short milliseconds (default window 5000ms).</li>
+<li><strong>Duplicate Flag</strong> — incoming Base64 image SHA-256 vs all historical hashes and within-dispatch repeats.</li>
+<li><strong>Density Check</strong> — total shift duration vs task count (default ceiling 12 tasks/hour); <code>NO_SHIFT</code> when unbounded.</li>
+<li>Bulk CSV Import: quote-aware parser mapping Email, Handle/Name, Location, Role, Skills.</li>
+<li>Network Topology Graph: interactive HTML5 Canvas — agents (left) → HQ (centre) → completed operational sectors (right); edge weight = completion count; hover tooltips; click an agent for the dossier.</li>
+<li>Spotlight Onboarding: dark mask with cut-out + tooltip steps; runs on first launch, rerunnable via HELP.</li>
+</ul>
+<h2>5. Module D: Civitas Frontline (The Agent Terminal)</h2>
+<p>A heavily restricted, standalone Progressive Web App for field operatives.</p>
+<ul>
+<li><strong>Service Worker / Offline-First:</strong> <code>manifest.json</code> + cache-first service worker; functions flawlessly in regional black spots. Queue stored in IndexedDB.</li>
+<li><strong>The Shift Protocol:</strong> "Start Shift" logs a Unix timestamp and geotag (where permitted), bounding billable/volunteer hours.</li>
+<li><strong>Evidence Cam:</strong> <code>&lt;input type="file" accept="image/*" capture="environment"&gt;</code> forces live camera usage where the platform honours it.</li>
+<li><strong>Pocket MMT (Analog/Digital Bridge):</strong> offline accordion of digital rebuttals matching the printed "Old Way vs New Way" campaign cards (8 cards shipped, incl. Card 04: Basic Income).</li>
+<li><strong>Black Box Telemetry:</strong> silent background array of UI interaction timestamps verifying agent presence; batched into IndexedDB; capped summary (last 500 events) rides each dispatch.</li>
+<li><strong>Burn Protocol:</strong> dominant UI button → type <code>BURN</code> → <code>indexedDB.deleteDatabase()</code> + <code>localStorage.clear()</code> + cache purge, instantly.</li>
+</ul>
+<h2>6. Development Sequence</h2>
+<ul>
+<li><strong>Phase 1: Foundation.</strong> Master JSON structure, File System Access API read/write, automated backup loops, core UI layout. ✅</li>
+<li><strong>Phase 2: Exocortex.</strong> Markdown parsing, wiki-linking, Context Panel algorithms, Manuscript Compiler, Tone.js. ✅</li>
+<li><strong>Phase 3: Operations &amp; Airlock.</strong> Task deployment, constraint logic, natural-language parsing, Dropzone ingestion UI. ✅</li>
+<li><strong>Phase 4: Network CRM.</strong> Topology canvas, CSV import, automated auditing algorithms. ✅</li>
+<li><strong>Phase 5: Frontline PWA.</strong> Mobile build, Service Workers, Canvas compression, Web Crypto encryption, shift telemetry. ✅</li>
+</ul>
+<hr>
+<h2>7. Amendments (decided during the build — 13 June 2026)</h2>
+<p>Reality-checks against browser platform constraints. None weaken the blueprint; each is logged ELI5 in <code>logs/</code>.</p>
+<ol>
+<li><strong>Localhost launcher required.</strong> The File System Access API pickers and service workers need a <em>secure context</em>. <code>file://</code> double-click is not reliably one, so <code>start_civitas.bat</code> serves everything at <code>http://localhost:8765</code> via Python's stdlib server (no Node, constraint intact). Frontline in the field must be served over HTTPS or LAN-localhost for the PWA install + service worker to engage.</li>
+<li><strong>Chromium requirement for the vault (Commander only).</strong> <code>showOpenFilePicker</code>/<code>showDirectoryPicker</code> exist only in Chrome/Edge. Fallback export/import buttons keep every other browser functional, with a red status pill making the degradation visible. Frontline deliberately avoids these APIs entirely.</li>
+<li><strong>One-click reconnect per session.</strong> Browsers may demote persisted file-handle permissions to "prompt" between sessions; regaining them requires a user gesture. Hence the explicit <strong>VAULT → Reconnect</strong> action instead of a silent (impossible) auto-grant.</li>
+<li><strong>Frontline ships with zero CDN dependencies</strong> (plain CSS, no Tailwind/FontAwesome/Chart.js). The spec's CDN list applies to the Commander Terminal; a field terminal that must work in black spots cannot gamble on a CDN being cached. The Commander itself degrades gracefully (charts/confetti/audio skip; core never breaks) if CDNs are unreachable.</li>
+<li><strong>Dispatch replay protection by id, not file-moves.</strong> Processed dispatches are remembered in <code>processedDispatchIds</code> rather than moving/deleting files in the Dropzone — file mutations in a SyncThing folder cause sync conflicts; ids don't.</li>
+<li><strong>Challenge answers stored as SHA-256 hashes</strong> in mission packs, so the pass-answer never travels or rests in cleartext on agent devices.</li>
+<li><strong><code>capture="environment"</code> is advisory</strong> on some browsers (iOS Safari honours it loosely). Treated as friction-not-proof; the canvas re-encode strips EXIF either way, and the duplicate-hash audit catches recycled images at HQ.</li>
+<li><strong><code>activityFeed</code> is append-only and never trimmed</strong> — it is the analytical record the dashboards and audits are built on. The localStorage <em>mirror</em> of state is best-effort only (evidence images can exceed its quota); the vault file on disk is canonical.</li>
+<li><strong>Backup cadence:</strong> a daily file (<code>civitas-backup-YYYY-MM-DD.json</code>, overwritten through the day on every save + every 30 minutes) plus on-demand timestamped <code>civitas-snapshot-*.json</code> for pre-surgery saves.</li>
+<li><strong>Audio requires a user gesture</strong> (browser autoplay policy) — noise starts from the header buttons, never automatically.</li>
+</ol>
+<p class="src">CIVITAS · generated from SPEC.md by tools/md2html.py — edit the .md, not this file.</p>
+</body>
+</html>

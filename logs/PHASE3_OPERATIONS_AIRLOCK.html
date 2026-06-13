@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 3 — Operations &amp; Airlock (ELI5 decision log)</title>
+<style>
+ body{max-width:860px;margin:2rem auto;padding:0 1.2rem 4rem;background:#0d0f14;color:#d8dbe2;
+      font:15px/1.65 'Segoe UI',system-ui,sans-serif}
+ h1,h2,h3,h4{font-family:Consolas,'Courier New',monospace;color:#e8b84b;letter-spacing:.5px;line-height:1.3}
+ h1{border-bottom:1px solid #262b3b;padding-bottom:.35em}
+ a{color:#7aa6d8} a:hover{color:#e8b84b}
+ code{background:#151823;border:1px solid #262b3b;border-radius:4px;padding:.1em .4em;
+      font-family:Consolas,monospace;font-size:.9em}
+ pre{background:#10131b;border:1px solid #262b3b;border-radius:8px;padding:14px;overflow-x:auto}
+ pre code{background:none;border:none;padding:0}
+ blockquote{border-left:3px solid #b88d2c;margin-left:0;padding-left:14px;color:#8d96a8}
+ table{border-collapse:collapse;margin:1em 0;width:100%}
+ th,td{border:1px solid #262b3b;padding:7px 11px;text-align:left}
+ th{background:#151823;color:#e8b84b;font-family:Consolas,monospace;font-size:.85em;letter-spacing:1px}
+ tr:nth-child(even){background:#11141d}
+ hr{border:none;border-top:1px solid #262b3b;margin:2.2rem 0}
+ .src{font-size:.75em;color:#566074;border-top:1px solid #262b3b;margin-top:3rem;padding-top:.8rem;
+      font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+<h1>Phase 3 — Operations &amp; Airlock (ELI5 decision log)</h1>
+<p><em>Build date: 13 June 2026</em></p>
+<h2>What got built</h2>
+<p>The doing room: missions with three kinds of proof, plain-English due dates, standing orders with streaks, dashboards, the focus timer — plus the Airlock that receives field dispatches into quarantine.</p>
+<h2>Decisions, explained like you're five</h2>
+<p><strong>1. Why three constraint types?</strong> Different jobs deserve different proof. "Read the council agenda" — just say you did it (<strong>Trust</strong>). "Letterbox Brisbane St" — show me the photo (<strong>Evidence</strong>). "Attend the meeting" — tell me the code word the organiser gave out (<strong>Challenge</strong>). Picking the proof level AT CREATION TIME is the whole anti-shirking design: the agent always knows what counts as done.</p>
+<p><strong>2. Why store challenge answers as hashes?</strong> A hash is a fingerprint: you can check a finger matches, but you can't rebuild the finger from the print. Mission packs travel through shared folders — if the pack carried the answer in plain text, any agent could read it out and "pass". With SHA-256, the pack carries only the fingerprint.</p>
+<p><strong>3. How does "Call MP next Friday" become a date?</strong> A small set of patterns runs over the text: today / tomorrow / next friday / in 3 days / 12/7 / ISO dates. Day-first because Australia. The matched phrase is removed from the mission text and becomes the due date. If the parser is unsure, it simply doesn't set a date — a wrong guess is worse than no guess.</p>
+<p><strong>4. Why do standing orders reset at midnight without a timer?</strong> The trick: we never store "done = yes". We store the <em>date</em> it was last done. The question "is it done?" is really "was it done TODAY?" — and that answer changes to "no" all by itself when the clock passes midnight. A timer just repaints the screen. Timers can be missed (laptop asleep); dates cannot.</p>
+<p><strong>5. Why does the Airlock exist instead of writing dispatches straight in?</strong> Quarantine. A field report is a <em>claim</em>, not a fact. Claims sit in escrow where the auditor stamps them (BATCH / DUPLICATE / DENSITY flags) and the Commander reads the stamps before any of it touches the master file. Approve = merge + XP + reliability up. Reject = reliability down. The database stays clean by construction, not by cleanup.</p>
+<p><strong>6. Why remember processed dispatch IDs instead of deleting the files?</strong> The dropzone is a <em>shared</em> folder (SyncThing/Dropbox). If HQ deletes or moves a file, the sync engine propagates that mutation to every device and conflicts bloom. Instead HQ keeps a list of "already seen" dispatch ids — files can stay, rescans skip them, replays are impossible.</p>
+<p><strong>7. Why does the focus timer need a BANK button?</strong> Deliberate ritual. The timer measures; banking <em>commits</em> the session to the campaign record (and the charts). Auto-banking would pollute the stats with abandoned half-sessions.</p>
+<p class="src">CIVITAS · generated from PHASE3_OPERATIONS_AIRLOCK.md by tools/md2html.py — edit the .md, not this file.</p>
+</body>
+</html>
